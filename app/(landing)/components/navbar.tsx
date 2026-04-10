@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Navbar() {
   return (
@@ -65,6 +64,15 @@ export function Navbar() {
             transition={{ delay: 0.5, duration: 0.4 }}
             className="flex items-center gap-4"
           >
+            <Link href={"/dashboard"}>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="border-2 border-foreground bg-background px-4 py-2 text-xs font-mono tracking-widest uppercase hover:cursor-pointer"
+              >
+                Dashboard
+              </motion.button>
+            </Link>
             <Link href={"/login"}>
               <motion.button
                 whileHover={{ scale: 1.02 }}
