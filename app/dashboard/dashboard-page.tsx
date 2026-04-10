@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useTheme } from "next-themes";
 import {
   BookCopy,
   Clock3,
   Flame,
   LogOut,
   MoreHorizontal,
+  Moon,
   Search,
   Settings,
   Sparkles,
+  Sun,
   Trash2,
 } from "lucide-react";
 import {
@@ -137,10 +140,16 @@ function DeadlineCard({ task }: { task: DeadlineTask }) {
 }
 
 export function DashboardPage() {
+  const { resolvedTheme, setTheme } = useTheme();
   const greetingState = useSyncExternalStore(
     subscribeToGreeting,
     getCachedGreetingState,
     () => defaultGreetingState,
+  );
+  const isMounted = useSyncExternalStore(
+    subscribeToGreeting,
+    () => true,
+    () => false,
   );
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -184,6 +193,8 @@ export function DashboardPage() {
     };
   }, []);
 
+  const isDarkMode = isMounted && resolvedTheme === "dark";
+
   return (
     <div className="min-h-screen bg-background text-foreground dot-grid-bg">
       <header
@@ -210,7 +221,7 @@ export function DashboardPage() {
           </label>
 
           <div className="flex items-center justify-end gap-3">
-            <div className="flex items-center gap-2 border-2 border-orange-500 bg-background px-4 py-3 shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
+            <div className="flex h-14 items-center gap-2 border-2 border-orange-500 bg-background px-4 shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
               <Flame className="h-5 w-5 text-orange-500" />
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
@@ -220,8 +231,26 @@ export function DashboardPage() {
               </div>
             </div>
 
+            <button
+              type="button"
+              onClick={() => setTheme(isDarkMode ? "light" : "dark")}
+              className="flex h-14 items-center gap-2 border-2 border-foreground bg-background px-4 shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5"
+              aria-label={
+                isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+              }
+            >
+              {isDarkMode ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+              <span className="text-xs font-mono uppercase tracking-[0.14em]">
+                {isDarkMode ? "Light" : "Dark"}
+              </span>
+            </button>
+
             <details className="relative">
-              <summary className="flex h-12 w-12 cursor-pointer list-none items-center justify-center border-2 border-foreground bg-background text-lg font-black uppercase shadow-[4px_4px_0_0_rgba(0,0,0,1)] [&::-webkit-details-marker]:hidden">
+              <summary className="flex h-14 w-14 cursor-pointer list-none items-center justify-center border-2 border-foreground bg-background text-lg font-black uppercase shadow-[4px_4px_0_0_rgba(0,0,0,1)] [&::-webkit-details-marker]:hidden">
                 {userInitial}
               </summary>
               <div className="absolute right-0 mt-3 flex min-w-44 flex-col border-2 border-foreground bg-background shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
@@ -306,15 +335,15 @@ export function DashboardPage() {
           <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
-                Enrolled modules
+                Modules
               </p>
               <h2 className="text-3xl font-black uppercase md:text-4xl">
                 Your classes
               </h2>
             </div>
-            <p className="text-sm font-mono uppercase tracking-[0.12em] text-muted-foreground">
-              Quick actions stay attached to each module
-            </p>
+            <button className="border-2 border-foreground bg-background px-4 py-3 text-sm font-mono uppercase tracking-[0.12em] shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5">
+              Add New
+            </button>
           </div>
 
           <div className="grid gap-5 lg:grid-cols-3">
