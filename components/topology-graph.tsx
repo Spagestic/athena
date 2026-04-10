@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { useEffect, useState } from "react"
+import { motion } from "framer-motion";
+import { useState } from "react";
 
 interface Node {
-  id: string
-  label: string
-  x: number
-  y: number
+  id: string;
+  label: string;
+  x: number;
+  y: number;
 }
 
 const NODES: Node[] = [
@@ -16,7 +16,7 @@ const NODES: Node[] = [
   { id: "model", label: "MODEL", x: 440, y: 180 },
   { id: "validate", label: "VALIDATE", x: 260, y: 280 },
   { id: "output", label: "OUTPUT", x: 620, y: 180 },
-]
+];
 
 const EDGES: [string, string][] = [
   ["input", "preprocess"],
@@ -24,13 +24,25 @@ const EDGES: [string, string][] = [
   ["input", "validate"],
   ["validate", "model"],
   ["model", "output"],
-]
+];
 
 function getNode(id: string) {
-  return NODES.find((n) => n.id === id)!
+  return NODES.find((n) => n.id === id)!;
 }
 
-function DataPacket({ x1, y1, x2, y2, delay }: { x1: number; y1: number; x2: number; y2: number; delay: number }) {
+function DataPacket({
+  x1,
+  y1,
+  x2,
+  y2,
+  delay,
+}: {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  delay: number;
+}) {
   return (
     <motion.circle
       r={4}
@@ -48,23 +60,24 @@ function DataPacket({ x1, y1, x2, y2, delay }: { x1: number; y1: number; x2: num
         ease: "linear",
       }}
     />
-  )
+  );
 }
 
 export function TopologyGraph() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const [mounted] = useState(() => typeof window !== "undefined");
 
   if (!mounted) {
-    return <div className="h-[360px] w-full border-2 border-foreground" />
+    return <div className="h-90 w-full border-2 border-foreground" />;
   }
 
   return (
     <div className="relative w-full border-2 border-foreground bg-background">
-      <svg viewBox="0 0 760 360" className="w-full h-auto" role="img" aria-label="AI system topology graph showing data flow from Input through Preprocess and Validate to Model and Output">
+      <svg
+        viewBox="0 0 760 360"
+        className="w-full h-auto"
+        role="img"
+        aria-label="AI system topology graph showing data flow from Input through Preprocess and Validate to Model and Output"
+      >
         {/* Grid lines for blueprint feel */}
         {Array.from({ length: 32 }).map((_, i) => (
           <line
@@ -91,8 +104,8 @@ export function TopologyGraph() {
 
         {/* Connection Lines */}
         {EDGES.map(([fromId, toId], i) => {
-          const from = getNode(fromId)
-          const to = getNode(toId)
+          const from = getNode(fromId);
+          const to = getNode(toId);
           return (
             <motion.line
               key={`edge-${i}`}
@@ -107,13 +120,13 @@ export function TopologyGraph() {
               animate={{ pathLength: 1, opacity: 1 }}
               transition={{ duration: 0.8, delay: i * 0.15, ease: "linear" }}
             />
-          )
+          );
         })}
 
         {/* Data Packets */}
         {EDGES.map(([fromId, toId], i) => {
-          const from = getNode(fromId)
-          const to = getNode(toId)
+          const from = getNode(fromId);
+          const to = getNode(toId);
           return (
             <DataPacket
               key={`packet-${i}`}
@@ -123,7 +136,7 @@ export function TopologyGraph() {
               y2={to.y}
               delay={i * 0.4}
             />
-          )
+          );
         })}
 
         {/* Nodes */}
@@ -169,5 +182,5 @@ export function TopologyGraph() {
         ))}
       </svg>
     </div>
-  )
+  );
 }
