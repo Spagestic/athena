@@ -1,8 +1,9 @@
-"use client"
+"use client";
 
-import { Cpu } from "lucide-react"
-import { motion } from "framer-motion"
-import { ThemeToggle } from "@/components/theme-toggle"
+import Link from "next/link";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Navbar() {
   return (
@@ -21,26 +22,40 @@ export function Navbar() {
             transition={{ delay: 0.2, duration: 0.4 }}
             className="flex items-center gap-3"
           >
-            <Cpu size={16} strokeWidth={1.5} />
-            <span className="text-xs font-mono tracking-[0.15em] uppercase font-bold">
-              SYS.INT
-            </span>
+            <Link href="/" className="flex items-center group">
+              <Image
+                alt="Logo"
+                className="h-8 w-8 pixel-crisp"
+                height={40}
+                src="/logo_.png"
+                width={40}
+              />
+              <span className="text-xs font-mono tracking-[0.15em] uppercase font-bold">
+                Athena
+              </span>
+            </Link>
           </motion.div>
 
           {/* Center nav links */}
           <div className="hidden md:flex items-center gap-8">
-            {["Platform", "Enterprise", "Resources", "Company"].map((link, i) => (
-              <motion.a
-                key={link}
-                href="#"
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="text-xs font-mono tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
-              >
-                {link}
-              </motion.a>
-            ))}
+            {["Platform", "Enterprise", "Resources", "Company"].map(
+              (link, i) => (
+                <motion.a
+                  key={link}
+                  href="#"
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    delay: 0.3 + i * 0.06,
+                    duration: 0.4,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  className="text-xs font-mono tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+                >
+                  {link}
+                </motion.a>
+              ),
+            )}
           </div>
 
           {/* Right side: Login + CTA */}
@@ -50,23 +65,18 @@ export function Navbar() {
             transition={{ delay: 0.5, duration: 0.4 }}
             className="flex items-center gap-4"
           >
-            <ThemeToggle />
-            <a
-              href="#"
-              className="hidden sm:block text-xs font-mono tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
-            >
-              Log In
-            </a>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="bg-foreground text-background px-4 py-2 text-xs font-mono tracking-widest uppercase"
-            >
-              Request Demo
-            </motion.button>
+            <Link href={"/login"}>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="bg-foreground text-background px-4 py-2 text-xs font-mono tracking-widest uppercase hover:cursor-pointer"
+              >
+                Login
+              </motion.button>
+            </Link>
           </motion.div>
         </div>
       </nav>
     </motion.div>
-  )
+  );
 }
