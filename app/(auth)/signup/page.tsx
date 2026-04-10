@@ -9,13 +9,13 @@ export default function SignupPage() {
         <div className="flex justify-center gap-2 md:justify-start">
           <Link href="/" className="flex items-center gap-3 group">
             <Image
-              alt="Zenith Logo"
+              alt="Logo"
               className="h-10 w-10 pixel-crisp"
               height={40}
               src="/logo_.png"
               width={40}
             />
-            <span className="font-medium">Zenith</span>
+            <span className="font-medium">Athena</span>
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-center">
