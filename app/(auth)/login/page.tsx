@@ -15,7 +15,9 @@ export default function LoginPage() {
               src="/logo_.png"
               width={40}
             />
-            <span className="font-medium">Athena</span>
+            <span className="text-xs font-mono tracking-[0.15em] uppercase font-bold">
+              Athena
+            </span>
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-center">
