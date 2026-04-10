@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: "Athena",
   description: "",
   icons: {
-    icon: "/convex.svg",
+    icon: "/logo_.png",
   },
 };
 

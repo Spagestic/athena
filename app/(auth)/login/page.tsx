@@ -7,7 +7,7 @@ export default function LoginPage() {
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
-          <Link href="/" className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center group">
             <Image
               alt="Logo"
               className="h-10 w-10 pixel-crisp"
@@ -25,7 +25,7 @@ export default function LoginPage() {
         </div>
       </div>
       <div className="bg-muted relative hidden lg:block">
-        <Image src="/auth.jpeg" alt="Zenith" fill className="object-cover" />
+        <Image src="/auth.jpeg" alt="Athena" fill className="object-cover" />
       </div>
     </div>
   );
