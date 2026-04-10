@@ -65,15 +65,15 @@ export function MetricsCard() {
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between border-b-2 border-foreground px-4 py-2">
         <span className="text-[10px] tracking-widest text-muted-foreground uppercase">
-          inference.metrics
+          athena.metrics
         </span>
         <span className="inline-block h-2 w-2 bg-[#ea580c]" />
       </div>
       <div className="flex-1 flex flex-col justify-center gap-6 p-6">
-        <ScrambleNumber target="4.2ms" label="Avg Latency" delay={500} />
-        <ScrambleNumber target="12.8K" label="Requests / sec" delay={800} />
-        <ScrambleNumber target="99.97%" label="Uptime" delay={1100} />
-        <ScrambleNumber target="147" label="Models Deployed" delay={1400} />
+        <ScrambleNumber target="300K+" label="Learners" delay={500} />
+        <ScrambleNumber target="106+" label="Countries" delay={800} />
+        <ScrambleNumber target="32+" label="Languages" delay={1100} />
+        <ScrambleNumber target="5+" label="AI Models" delay={1400} />
       </div>
     </div>
   )

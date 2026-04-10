@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react"
 import { ArrowRight, Check, Minus } from "lucide-react"
-import { motion } from "framer-motion"
+import { motion, useReducedMotion } from "framer-motion"
 
-const ease = [0.22, 1, 0.36, 1] as const
+const entrance = [0.16, 1, 0.3, 1] as const
 
-/* ── scramble-in price effect ── */
+/* ΓöÇΓöÇ scramble-in price effect ΓöÇΓöÇ */
 function ScramblePrice({ target, prefix = "$" }: { target: string; prefix?: string }) {
   const [display, setDisplay] = useState(target.replace(/[0-9]/g, "0"))
 
@@ -41,7 +41,7 @@ function ScramblePrice({ target, prefix = "$" }: { target: string; prefix?: stri
   )
 }
 
-/* ── data-stream status line ── */
+/* ΓöÇΓöÇ data-stream status line ΓöÇΓöÇ */
 function StatusLine() {
   const [throughput, setThroughput] = useState("0.0")
 
@@ -60,12 +60,12 @@ function StatusLine() {
   )
 }
 
-/* ── blinking cursor indicator ── */
+/* ΓöÇΓöÇ blinking cursor indicator ΓöÇΓöÇ */
 function BlinkDot() {
   return <span className="inline-block h-2 w-2 bg-[#ea580c] animate-blink" />
 }
 
-/* ── tier config ── */
+/* ΓöÇΓöÇ tier config ΓöÇΓöÇ */
 interface Tier {
   id: string
   name: string
@@ -80,77 +80,86 @@ interface Tier {
 
 const TIERS: Tier[] = [
   {
-    id: "open-source",
-    name: "OPEN_SOURCE",
+    id: "free",
+    name: "FREE",
     price: "0",
     period: "/ forever",
     tag: null,
-    description: "Community-grade inference. Rate-limited. No SLA.",
+    description: "Get started with Athena. No credit card required.",
     features: [
-      { text: "10K requests / month", included: true },
-      { text: "Community models", included: true },
-      { text: "Shared compute pool", included: true },
-      { text: "Single region", included: true },
-      { text: "Priority routing", included: false },
-      { text: "Dedicated support", included: false },
+      { text: "Upload PDFs, videos, websites", included: true },
+      { text: "AI chat with citations", included: true },
+      { text: "Flashcard generation", included: true },
+      { text: "Practice tests", included: true },
+      { text: "Advanced AI models", included: false },
+      { text: "Unlimited sources", included: false },
     ],
-    cta: "DEPLOY FREE",
+    cta: "GET STARTED FREE",
     highlighted: false,
   },
   {
     id: "pro",
-    name: "PRO_TIER",
-    price: "249",
+    name: "PRO",
+    price: "19",
     period: "/ month",
     tag: "RECOMMENDED",
-    description: "Production-grade. Sub-5ms latency. 99.97% uptime SLA.",
+    description: "Full access to all Athena features and AI models.",
     features: [
-      { text: "Unlimited requests", included: true },
-      { text: "All 147 foundation models", included: true },
-      { text: "Dedicated compute", included: true },
-      { text: "12-region edge deployment", included: true },
-      { text: "Priority routing", included: true },
-      { text: "Dedicated support", included: false },
+      { text: "Everything in Free", included: true },
+      { text: "Claude, GPT-4, Gemini, DeepSeek", included: true },
+      { text: "Unlimited sources", included: true },
+      { text: "Notes, mindmaps, track mode", included: true },
+      { text: "Audio walkthroughs", included: true },
+      { text: "Priority support", included: false },
     ],
-    cta: "START BUILDING",
+    cta: "START PRO",
     highlighted: true,
   },
   {
-    id: "enterprise",
-    name: "ENTERPRISE",
+    id: "team",
+    name: "TEAM",
     price: "CUSTOM",
     period: "",
     tag: null,
-    description: "Air-gapped. On-prem. Full operational control.",
+    description: "For universities, teams, and organizations.",
     features: [
-      { text: "Unlimited everything", included: true },
-      { text: "Custom model fine-tuning", included: true },
-      { text: "Dedicated cluster", included: true },
-      { text: "50+ edge regions", included: true },
-      { text: "Custom SLA", included: true },
-      { text: "24/7 dedicated engineering", included: true },
+      { text: "Everything in Pro", included: true },
+      { text: "Team workspace", included: true },
+      { text: "Admin dashboard", included: true },
+      { text: "Custom integrations", included: true },
+      { text: "SSO & compliance", included: true },
+      { text: "Dedicated support", included: true },
     ],
-    cta: "CONTACT SALES",
+    cta: "CONTACT US",
     highlighted: false,
   },
 ]
 
-/* ── single pricing card ── */
+/* ΓöÇΓöÇ single pricing card ΓöÇΓöÇ */
 function PricingCard({ tier, index }: { tier: Tier; index: number }) {
   const isCustom = tier.price === "CUSTOM"
+  const prefersReduced = useReducedMotion()
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
+      initial={prefersReduced ? false : { opacity: 0, y: 30, filter: "blur(4px)" }}
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ delay: index * 0.12, duration: 0.6, ease }}
-      className={`flex flex-col h-full ${
+      transition={{ delay: index * 0.12, duration: 0.6, ease: entrance }}
+      className={`relative flex flex-col h-full ${
         tier.highlighted
           ? "border-2 border-foreground bg-foreground text-background"
           : "border-2 border-foreground bg-background text-foreground"
       }`}
     >
+      {/* Looping orange border pulse for recommended tier */}
+      {tier.highlighted && !prefersReduced && (
+        <motion.div
+          className="absolute inset-0 border-2 border-[#E97316] pointer-events-none z-10"
+          animate={{ opacity: [0.3, 0.8, 0.3] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+        />
+      )}
       {/* Card header */}
       <div
         className={`flex items-center justify-between px-5 py-3 border-b-2 ${
@@ -214,7 +223,7 @@ function PricingCard({ tier, index }: { tier: Tier; index: number }) {
               initial={{ opacity: 0, x: -8 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.12 + 0.3 + fi * 0.04, duration: 0.35, ease }}
+              transition={{ delay: index * 0.12 + 0.3 + fi * 0.04, duration: 0.35, ease: entrance }}
               className="flex items-start gap-3"
             >
               {feature.included ? (
@@ -251,25 +260,26 @@ function PricingCard({ tier, index }: { tier: Tier; index: number }) {
       {/* CTA */}
       <div className="px-5 pb-5 pt-3">
         <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          className={`group w-full flex items-center justify-center gap-0 text-xs font-mono tracking-wider uppercase ${
+          whileHover={prefersReduced ? {} : { scale: 1.02 }}
+          whileTap={prefersReduced ? {} : { scale: 0.97 }}
+          className={`group relative w-full flex items-center justify-center gap-0 text-xs font-mono tracking-wider uppercase overflow-hidden ${
             tier.highlighted
               ? "bg-background text-foreground"
               : "bg-foreground text-background"
           }`}
         >
-          <span className="flex items-center justify-center w-9 h-9 bg-[#ea580c]">
+          <span className="flex items-center justify-center w-9 h-9 bg-[#ea580c] relative z-10">
             <ArrowRight size={14} strokeWidth={2} className="text-background" />
           </span>
-          <span className="flex-1 py-2.5">{tier.cta}</span>
+          <span className="absolute inset-0 left-9 bg-[#E97316] translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+          <span className="relative z-10 flex-1 py-2.5">{tier.cta}</span>
         </motion.button>
       </div>
     </motion.div>
   )
 }
 
-/* ── main pricing section ── */
+/* ΓöÇΓöÇ main pricing section ΓöÇΓöÇ */
 export function PricingSection() {
   return (
     <section className="w-full px-6 py-20 lg:px-12">
@@ -278,7 +288,7 @@ export function PricingSection() {
         initial={{ opacity: 0, x: -20 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.5, ease }}
+        transition={{ duration: 0.5, ease: entrance }}
         className="flex items-center gap-4 mb-8"
       >
         <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
@@ -296,15 +306,15 @@ export function PricingSection() {
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: 0.6, ease }}
+        transition={{ duration: 0.6, ease: entrance }}
         className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12"
       >
         <div className="flex flex-col gap-3">
           <h2 className="text-2xl lg:text-3xl font-mono font-bold tracking-tight uppercase text-foreground text-balance">
-            Select your compute tier
+            Choose your plan
           </h2>
           <p className="text-xs lg:text-sm font-mono text-muted-foreground leading-relaxed max-w-md">
-            All tiers include zero-config deploys, built-in monitoring, and access to the SYS.INT inference API.
+            No credit card required. Free forever plan available.
           </p>
         </div>
         <StatusLine />
@@ -322,11 +332,11 @@ export function PricingSection() {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        transition={{ delay: 0.5, duration: 0.5, ease }}
+        transition={{ delay: 0.5, duration: 0.5, ease: entrance }}
         className="flex items-center gap-3 mt-6"
       >
         <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
-          {"* All plans billed annually. Cancel anytime. No vendor lock-in."}
+          {"* No credit card required. Free forever plan. Cancel anytime."}
         </span>
         <div className="flex-1 border-t border-border" />
       </motion.div>

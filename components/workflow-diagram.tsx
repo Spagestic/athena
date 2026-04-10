@@ -1,31 +1,39 @@
-"use client";
+"use client"
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion"
+import { useEffect, useState } from "react"
 
-const LEFT_LABELS = ["Train", "Package", "Version"];
-const RIGHT_LABELS = ["Route", "Deploy", "Observe"];
+const LEFT_LABELS = ["PDF", "VIDEO", "WEB", "TEXT"]
+const RIGHT_LABELS = ["FLASHCARDS", "NOTES", "TEST", "PODCAST"]
+
+const entrance = [0.16, 1, 0.3, 1] as const
 
 function PillLabel({
   label,
   x,
   y,
   delay,
+  width = 80,
+  fromRight = false,
 }: {
-  label: string;
-  x: number;
-  y: number;
-  delay: number;
+  label: string
+  x: number
+  y: number
+  delay: number
+  width?: number
+  fromRight?: boolean
 }) {
+  const prefersReduced = useReducedMotion()
   return (
     <motion.g
-      initial={{ opacity: 0, x: x > 400 ? 20 : -20 }}
+      initial={prefersReduced ? false : { opacity: 0, x: fromRight ? 24 : -24 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5, delay }}
+      transition={{ duration: 0.5, delay, ease: entrance }}
     >
       <rect
         x={x}
         y={y}
-        width={80}
+        width={width}
         height={26}
         rx={13}
         fill="none"
@@ -33,11 +41,11 @@ function PillLabel({
         strokeWidth={1.5}
       />
       <text
-        x={x + 40}
+        x={x + width / 2}
         y={y + 17}
         textAnchor="middle"
         fill="hsl(var(--foreground))"
-        fontSize={10}
+        fontSize={9}
         fontFamily="var(--font-mono), monospace"
         fontWeight={500}
         letterSpacing="0.05em"
@@ -45,45 +53,63 @@ function PillLabel({
         {label}
       </text>
     </motion.g>
-  );
+  )
 }
 
 export function WorkflowDiagram() {
-  const centerX = 400;
-  const centerY = 100;
+  const [mounted, setMounted] = useState(false)
+  const prefersReduced = useReducedMotion()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return <div className="h-[220px] w-full" />
+  }
+
+  const centerX = 400
+  const centerY = 110
+  const leftPillW = 80
+  const rightPillW = 100
+
+  // Timing: lines 0.2-0.6s, pills 0.5-0.8s, center 0.9s, dots 1.2s+
+  const lineBaseDelay = 0.2
+  const pillBaseDelay = 0.5
+  const centerDelay = 0.9
 
   return (
-    <div className="relative mx-auto w-full max-w-200">
+    <div className="relative w-full max-w-[800px] mx-auto">
       <svg
-        viewBox="0 0 800 200"
+        viewBox="0 0 800 220"
         className="w-full h-auto"
         role="img"
-        aria-label="Workflow diagram showing connected deployment stages: Train, Package, Version, Route, Deploy, Observe"
+        aria-label="Workflow diagram showing Athena pipeline: PDF, VIDEO, WEB, TEXT inputs → ATHENA → FLASHCARDS, NOTES, TEST, PODCAST outputs"
       >
-        {/* Left lines from center to left labels */}
+        {/* Left lines draw outward from center */}
         {LEFT_LABELS.map((_, i) => {
-          const pillX = 60;
-          const pillY = 30 + i * 60;
+          const pillX = 60
+          const pillY = 20 + i * 52
           return (
             <motion.line
               key={`left-line-${i}`}
               x1={centerX - 40}
               y1={centerY}
-              x2={pillX + 80}
+              x2={pillX + leftPillW}
               y2={pillY + 13}
               stroke="hsl(var(--border))"
               strokeWidth={1}
-              initial={{ pathLength: 0, opacity: 0 }}
+              initial={prefersReduced ? false : { pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 + i * 0.1 }}
+              transition={{ duration: 0.5, delay: lineBaseDelay + i * 0.08, ease: entrance }}
             />
-          );
+          )
         })}
 
-        {/* Right lines from center to right labels */}
+        {/* Right lines draw outward from center */}
         {RIGHT_LABELS.map((_, i) => {
-          const pillX = 660;
-          const pillY = 30 + i * 60;
+          const pillX = 640
+          const pillY = 20 + i * 52
           return (
             <motion.line
               key={`right-line-${i}`}
@@ -93,89 +119,95 @@ export function WorkflowDiagram() {
               y2={pillY + 13}
               stroke="hsl(var(--border))"
               strokeWidth={1}
-              initial={{ pathLength: 0, opacity: 0 }}
+              initial={prefersReduced ? false : { pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 + i * 0.1 }}
+              transition={{ duration: 0.5, delay: lineBaseDelay + i * 0.08, ease: entrance }}
             />
-          );
+          )
         })}
 
-        {/* Data packets flowing along lines */}
+        {/* Orange connector dots — pulse loop, 2s cycle */}
         {LEFT_LABELS.map((_, i) => {
-          const pillX = 60;
-          const pillY = 30 + i * 60;
+          const pillX = 60
+          const pillY = 20 + i * 52
           return (
             <motion.circle
               key={`left-packet-${i}`}
               r={3}
               fill="#ea580c"
-              initial={{ cx: pillX + 80, cy: pillY + 13 }}
+              initial={{ cx: pillX + leftPillW, cy: pillY + 13, opacity: 0 }}
               animate={{
-                cx: [pillX + 80, centerX - 40],
+                cx: [pillX + leftPillW, centerX - 40],
                 cy: [pillY + 13, centerY],
+                opacity: [0.4, 1, 0.4],
               }}
               transition={{
-                duration: 1.8,
-                delay: 0.8 + i * 0.6,
+                duration: 2,
+                delay: 1.2 + i * 0.4,
                 repeat: Infinity,
-                repeatDelay: 3,
+                repeatDelay: 2,
                 ease: "linear",
               }}
             />
-          );
+          )
         })}
 
         {RIGHT_LABELS.map((_, i) => {
-          const pillX = 660;
-          const pillY = 30 + i * 60;
+          const pillX = 640
+          const pillY = 20 + i * 52
           return (
             <motion.circle
               key={`right-packet-${i}`}
               r={3}
               fill="#ea580c"
-              initial={{ cx: centerX + 40, cy: centerY }}
+              initial={{ cx: centerX + 40, cy: centerY, opacity: 0 }}
               animate={{
                 cx: [centerX + 40, pillX],
                 cy: [centerY, pillY + 13],
+                opacity: [0.4, 1, 0.4],
               }}
               transition={{
-                duration: 1.8,
-                delay: 1.2 + i * 0.6,
+                duration: 2,
+                delay: 1.6 + i * 0.4,
                 repeat: Infinity,
-                repeatDelay: 3,
+                repeatDelay: 2,
                 ease: "linear",
               }}
             />
-          );
+          )
         })}
 
-        {/* Left pill labels */}
+        {/* Left pill labels — slide from left, staggered 80ms */}
         {LEFT_LABELS.map((label, i) => (
           <PillLabel
             key={`left-${label}`}
             label={label}
             x={60}
-            y={30 + i * 60}
-            delay={0.1 + i * 0.1}
+            y={20 + i * 52}
+            delay={pillBaseDelay + i * 0.08}
+            width={leftPillW}
+            fromRight={false}
           />
         ))}
 
-        {/* Right pill labels */}
+        {/* Right pill labels — slide from right, staggered 80ms */}
         {RIGHT_LABELS.map((label, i) => (
           <PillLabel
             key={`right-${label}`}
             label={label}
-            x={660}
-            y={30 + i * 60}
-            delay={0.1 + i * 0.1}
+            x={640}
+            y={20 + i * 52}
+            delay={pillBaseDelay + i * 0.08}
+            width={rightPillW}
+            fromRight={true}
           />
         ))}
 
-        {/* Center logo square */}
+        {/* Center ATHENA node — scales in LAST after lines complete */}
         <motion.g
-          initial={{ opacity: 0, scale: 0.5 }}
+          initial={prefersReduced ? false : { opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
+          transition={{ duration: 0.5, delay: centerDelay, ease: entrance }}
         >
           <rect
             x={centerX - 36}
@@ -186,63 +218,35 @@ export function WorkflowDiagram() {
             stroke="hsl(var(--border))"
             strokeWidth={1.5}
           />
-          {/* Abstract cross/flower logo shape */}
-          <line
-            x1={centerX}
-            y1={centerY - 18}
-            x2={centerX}
-            y2={centerY + 18}
-            stroke="hsl(var(--foreground))"
-            strokeWidth={3}
-          />
-          <line
-            x1={centerX - 18}
-            y1={centerY}
-            x2={centerX + 18}
-            y2={centerY}
-            stroke="hsl(var(--foreground))"
-            strokeWidth={3}
-          />
-          <line
-            x1={centerX - 12}
-            y1={centerY - 12}
-            x2={centerX + 12}
-            y2={centerY + 12}
-            stroke="hsl(var(--foreground))"
-            strokeWidth={2}
-          />
-          <line
-            x1={centerX + 12}
-            y1={centerY - 12}
-            x2={centerX - 12}
-            y2={centerY + 12}
-            stroke="hsl(var(--foreground))"
-            strokeWidth={2}
-          />
-          {/* Pulsing ring */}
-          <circle
-            cx={centerX}
-            cy={centerY}
-            r={30}
-            fill="none"
-            stroke="#ea580c"
-            strokeWidth={1}
+          <text
+            x={centerX}
+            y={centerY + 5}
+            textAnchor="middle"
+            fill="hsl(var(--foreground))"
+            fontSize={12}
+            fontFamily="var(--font-mono), monospace"
+            fontWeight={700}
+            letterSpacing="0.1em"
           >
+            ATHENA
+          </text>
+          {/* Pulsing ring */}
+          <circle cx={centerX} cy={centerY} r={30} fill="none" stroke="#ea580c" strokeWidth={1}>
             <animate
               attributeName="r"
               values="30;34;30"
-              dur="3s"
+              dur="2s"
               repeatCount="indefinite"
             />
             <animate
               attributeName="opacity"
-              values="0.6;0.2;0.6"
-              dur="3s"
+              values="0.4;1;0.4"
+              dur="2s"
               repeatCount="indefinite"
             />
           </circle>
         </motion.g>
       </svg>
     </div>
-  );
+  )
 }
