@@ -12,6 +12,7 @@ import type * as CustomPassword from "../CustomPassword.js";
 import type * as auth from "../auth.js";
 import type * as exa from "../exa.js";
 import type * as http from "../http.js";
+import type * as mistral from "../mistral.js";
 import type * as ocr from "../ocr.js";
 import type * as users from "../users.js";
 
@@ -26,6 +27,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   exa: typeof exa;
   http: typeof http;
+  mistral: typeof mistral;
   ocr: typeof ocr;
   users: typeof users;
 }>;
