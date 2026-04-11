@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# python
+*.pkl
+__pycache__/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
