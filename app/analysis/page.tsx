@@ -532,8 +532,9 @@ export default function AnalysisDashboard() {
         <div className="min-h-screen flex flex-col bg-background text-foreground font-mono">
             {/* HEADER */}
             <div className="flex items-center justify-between px-6 py-3 bg-card border-b-2 border-foreground">
-                <h1 className="text-sm font-bold tracking-[0.15em] uppercase">
-                    <span className="text-primary">HKUSTEAM</span> LIVE DASHBOARD
+                <h1 className="text-sm font-bold tracking-[0.15em] uppercase flex items-center gap-2">
+                    <img src="/logo_.png" alt="Athena" className="h-5 w-5 pixel-crisp" />
+                    <span className="text-primary">ATHENA</span> LIVE DASHBOARD
                 </h1>
                 <div className="flex items-center gap-4">
                     <span className="text-3xl font-bold text-chart-4 tabular-nums">{timer}</span>
