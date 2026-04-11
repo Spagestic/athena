@@ -1,5 +1,30 @@
-import { BookCopy, MoreHorizontal, Settings, Trash2 } from "lucide-react";
+"use client";
 
+import { useMutation } from "convex/react";
+import {
+  BookCopy,
+  Loader2,
+  MoreHorizontal,
+  Plus,
+  Settings,
+  Trash2,
+} from "lucide-react";
+import { type FormEvent, useState } from "react";
+
+import { api } from "@/convex/_generated/api";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { type DashboardModule } from "../dashboard-data";
 
 type ModuleCardsProps = {
@@ -7,26 +32,152 @@ type ModuleCardsProps = {
 };
 
 export function ModuleCards({ modules }: ModuleCardsProps) {
+  const createFolder = useMutation(api.folders.createFolder);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [courseName, setCourseName] = useState("");
+  const [description, setDescription] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const resetForm = () => {
+    setCourseName("");
+    setDescription("");
+    setFormError(null);
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      resetForm();
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCreateCourse = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const trimmedName = courseName.trim();
+    if (trimmedName.length < 3) {
+      setFormError("Course name must be at least 3 characters.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setFormError(null);
+
+    try {
+      await createFolder({
+        description: description.trim() || undefined,
+        name: trimmedName,
+      });
+      handleOpenChange(false);
+    } catch (error) {
+      setFormError(
+        error instanceof Error ? error.message : "Unable to create course.",
+      );
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section className="space-y-4 pb-8">
       <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
-            Modules
+            Course workspaces
           </p>
           <h2 className="text-3xl font-black uppercase md:text-4xl">
-            Your classes
+            Your courses
           </h2>
         </div>
-        <button className="border-2 border-foreground bg-background px-4 py-3 text-sm font-mono uppercase tracking-[0.12em] shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5">
-          Add New
-        </button>
+        <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
+          <DialogTrigger
+            render={
+              <Button className="border-2 border-foreground bg-background px-4 py-3 text-sm font-mono uppercase tracking-[0.12em] text-foreground shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5" />
+            }
+          >
+            <Plus className="h-4 w-4" />
+            Add New
+          </DialogTrigger>
+          <DialogContent className="max-w-xl border-2 border-foreground bg-background p-0 shadow-[8px_8px_0_0_rgba(0,0,0,1)]">
+            <form onSubmit={handleCreateCourse}>
+              <DialogHeader className="border-b-2 border-foreground px-6 py-5">
+                <DialogTitle className="text-xl font-black uppercase tracking-[0.12em]">
+                  Create Course Workspace
+                </DialogTitle>
+                <DialogDescription className="font-mono uppercase tracking-[0.08em]">
+                  Start a new course folder for notes, quizzes, and momentum
+                  tracking.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-5 px-6 py-5">
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="course-name"
+                    className="font-mono uppercase tracking-[0.12em]"
+                  >
+                    Course Name
+                  </Label>
+                  <Input
+                    id="course-name"
+                    value={courseName}
+                    onChange={(event) => setCourseName(event.target.value)}
+                    placeholder="COMP1021 - Introduction to Computer Science"
+                    className="h-11 border-2 border-foreground bg-background shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="course-description"
+                    className="font-mono uppercase tracking-[0.12em]"
+                  >
+                    Description
+                  </Label>
+                  <Textarea
+                    id="course-description"
+                    value={description}
+                    onChange={(event) => setDescription(event.target.value)}
+                    placeholder="Exam focus, professor, or what you want Athena to help you track."
+                    className="min-h-24 border-2 border-foreground bg-background shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                {formError ? (
+                  <p className="border-2 border-red-500 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-700">
+                    {formError}
+                  </p>
+                ) : null}
+              </div>
+
+              <DialogFooter className="border-t-2 border-foreground bg-muted/20">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleOpenChange(false)}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : null}
+                  {isSubmitting ? "Creating..." : "Create Course"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-3">
         {modules.map((module) => (
           <article
-            key={module.code}
+            key={module.id}
             className="group relative flex h-full cursor-pointer flex-col justify-between gap-6 overflow-hidden border-2 border-foreground bg-card p-5 shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
           >
             <div className="pointer-events-none absolute inset-0 z-0 origin-left scale-x-0 bg-zinc-400/10 transition-transform duration-150 ease-out group-hover:scale-x-100" />
@@ -57,7 +208,7 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
                   {module.title}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {module.professor}
+                  {module.subtitle}
                 </p>
               </div>
             </div>
@@ -82,7 +233,7 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
         ))}
         {modules.length === 0 ? (
           <div className="border-2 border-dashed border-foreground bg-background px-4 py-5 text-sm font-mono uppercase tracking-[0.14em] text-muted-foreground lg:col-span-3">
-            No modules match that filter.
+            No courses match that filter yet.
           </div>
         ) : null}
       </div>

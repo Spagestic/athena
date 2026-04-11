@@ -66,13 +66,13 @@ export function DeadlineCard({ task }: DeadlineCardProps) {
 
         <div className="flex shrink-0 items-center gap-2 border-2 border-foreground bg-background px-2.5 py-2 text-xs font-mono uppercase tracking-[0.14em] md:text-sm">
           <Clock3 className="h-4 w-4" />
-          Risk {task.effortScore}
+          Signal {task.signalScore}
         </div>
       </div>
 
       <div className="mt-2 space-y-1.5">
         <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-          <span>Deadline window</span>
+          <span>Priority window</span>
           <span>{task.progress}% remaining</span>
         </div>
         <div className="h-3.5 border-2 border-foreground bg-background p-0.5">

@@ -1,17 +1,17 @@
 import { Sparkles } from "lucide-react";
 
-import { userFirstName } from "../dashboard-data";
-
 type DashboardOverviewProps = {
   greeting: string;
   deadlineCount: number;
   moduleCount: number;
+  userFirstName: string;
 };
 
 export function DashboardOverview({
   greeting,
   deadlineCount,
   moduleCount,
+  userFirstName,
 }: DashboardOverviewProps) {
   return (
     <section className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
@@ -24,8 +24,8 @@ export function DashboardOverview({
             {greeting}, {userFirstName}
           </h1>
           <p className="max-w-2xl text-base font-medium text-muted-foreground md:text-lg">
-            Surface the most urgent deadlines first, then move straight into the
-            work that needs attention.
+            Surface the strongest momentum signals first, then move straight into
+            the course work that needs attention.
           </p>
         </div>
       </div>
@@ -36,7 +36,7 @@ export function DashboardOverview({
             Active focus
           </p>
           <h2 className="text-2xl font-black uppercase leading-tight">
-            {deadlineCount} deadlines across {moduleCount} modules
+            {deadlineCount} focus items across {moduleCount} courses
           </h2>
         </div>
         <div className="flex items-center gap-3 border-2 border-primary-foreground bg-background px-4 py-3 text-foreground">

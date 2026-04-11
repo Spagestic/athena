@@ -1,12 +1,14 @@
 "use client";
 
+import { useQuery } from "convex/react";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
+import { api } from "@/convex/_generated/api";
 import { DashboardHeader } from "./components/dashboard-header";
 import { DashboardOverview } from "./components/dashboard-overview";
+import { type DashboardNotification } from "./dashboard-data";
 import { DeadlineRadar } from "./components/deadline-radar";
 import { ModuleCards } from "./components/module-cards";
-import { dashboardModules, deadlineTasks } from "./dashboard-data";
 
 type GreetingState = {
   greeting: string;
@@ -41,6 +43,7 @@ function subscribeToGreeting() {
 }
 
 export default function DashboardPage() {
+  const dashboard = useQuery(api.dashboard.getDashboard);
   const greetingState = useSyncExternalStore(
     subscribeToGreeting,
     getCachedGreetingState,
@@ -48,32 +51,49 @@ export default function DashboardPage() {
   );
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const modules = dashboard?.modules;
+  const tasks = dashboard?.tasks;
+  const notifications = useMemo<DashboardNotification[]>(() => {
+    if (!tasks || tasks.length === 0) {
+      return [];
+    }
+
+    return tasks.slice(0, 2).map((task) => ({
+      detail: `${task.moduleCode} · ${task.dueLabel}`,
+      title: task.title,
+    }));
+  }, [tasks]);
+  const userFirstName =
+    dashboard?.user?.name?.trim().split(/\s+/)[0] ||
+    (dashboard === null ? "there" : "Learner");
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   const filteredTasks = useMemo(() => {
+    const sourceTasks = tasks ?? [];
     if (!normalizedQuery) {
-      return deadlineTasks;
+      return sourceTasks;
     }
 
-    return deadlineTasks.filter((task) =>
+    return sourceTasks.filter((task) =>
       [task.title, task.moduleCode, task.dueLabel].some((value) =>
         value.toLowerCase().includes(normalizedQuery),
       ),
     );
-  }, [normalizedQuery]);
+  }, [normalizedQuery, tasks]);
 
   const filteredModules = useMemo(() => {
+    const sourceModules = modules ?? [];
     if (!normalizedQuery) {
-      return dashboardModules;
+      return sourceModules;
     }
 
-    return dashboardModules.filter((module) =>
-      [module.code, module.title, module.professor].some((value) =>
+    return sourceModules.filter((module) =>
+      [module.code, module.title, module.subtitle].some((value) =>
         value.toLowerCase().includes(normalizedQuery),
       ),
     );
-  }, [normalizedQuery]);
+  }, [modules, normalizedQuery]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -92,7 +112,10 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background text-foreground dot-grid-bg">
       <DashboardHeader
         isScrolled={isScrolled}
+        notifications={notifications}
         searchQuery={searchQuery}
+        streakCount={dashboard?.streakCount ?? 0}
+        user={dashboard?.user ?? null}
         onSearchQueryChange={setSearchQuery}
       />
 
@@ -101,6 +124,7 @@ export default function DashboardPage() {
           greeting={greetingState.greeting}
           deadlineCount={filteredTasks.length}
           moduleCount={filteredModules.length}
+          userFirstName={userFirstName}
         />
 
         <DeadlineRadar tasks={filteredTasks} />

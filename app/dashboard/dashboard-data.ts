@@ -7,15 +7,26 @@ export type DeadlineTask = {
   dueLabel: string;
   urgency: DeadlineUrgency;
   progress: number;
-  effortScore: number;
+  signalScore: number;
 };
 
 export type DashboardModule = {
+  id: string;
   code: string;
   title: string;
   noteCount: number;
   pendingTasks: number;
-  professor: string;
+  subtitle: string;
+};
+
+export type DashboardUser = {
+  name?: string | null;
+  image?: string | null;
+};
+
+export type DashboardNotification = {
+  title: string;
+  detail: string;
 };
 
 export const streakCount = 67;
@@ -30,7 +41,7 @@ export const deadlineTasks: DeadlineTask[] = [
     dueLabel: "Due in 4 hours",
     urgency: "critical",
     progress: 12,
-    effortScore: 93,
+    signalScore: 93,
   },
   {
     id: "math-problem-set",
@@ -39,7 +50,7 @@ export const deadlineTasks: DeadlineTask[] = [
     dueLabel: "Due in 1 day",
     urgency: "medium",
     progress: 38,
-    effortScore: 71,
+    signalScore: 71,
   },
   {
     id: "phys-quiz",
@@ -48,7 +59,7 @@ export const deadlineTasks: DeadlineTask[] = [
     dueLabel: "Due in 2 days",
     urgency: "medium",
     progress: 51,
-    effortScore: 64,
+    signalScore: 64,
   },
   {
     id: "comp-reading",
@@ -57,7 +68,7 @@ export const deadlineTasks: DeadlineTask[] = [
     dueLabel: "Due in 4 days",
     urgency: "low",
     progress: 79,
-    effortScore: 42,
+    signalScore: 42,
   },
   {
     id: "phys-summary",
@@ -66,30 +77,33 @@ export const deadlineTasks: DeadlineTask[] = [
     dueLabel: "Due in 6 days",
     urgency: "low",
     progress: 91,
-    effortScore: 28,
+    signalScore: 28,
   },
 ];
 
 export const dashboardModules: DashboardModule[] = [
   {
+    id: "comp1021",
     code: "COMP1021",
     title: "Introduction to Computer Science",
     noteCount: 18,
     pendingTasks: 4,
-    professor: "Prof. Gibson Lam",
+    subtitle: "Prof. Gibson Lam",
   },
   {
+    id: "math1014",
     code: "MATH1014",
     title: "Calculus 2",
     noteCount: 11,
     pendingTasks: 3,
-    professor: "Kam Hang Cheng",
+    subtitle: "Kam Hang Cheng",
   },
   {
+    id: "phys1112",
     code: "PHYS1112",
     title: "General Physics 1",
     noteCount: 14,
     pendingTasks: 2,
-    professor: "Kirill Prokofiev",
+    subtitle: "Kirill Prokofiev",
   },
 ];

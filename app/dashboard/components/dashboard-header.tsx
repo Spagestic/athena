@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Bell, Flame, LogOut, Search, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { userInitial, streakCount } from "../dashboard-data";
+import {
+  type DashboardNotification,
+  type DashboardUser,
+} from "../dashboard-data";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,34 +18,31 @@ import {
 
 type DashboardHeaderProps = {
   isScrolled: boolean;
+  notifications: DashboardNotification[];
   searchQuery: string;
+  streakCount: number;
+  user: DashboardUser | null;
   onSearchQueryChange: (value: string) => void;
 };
 
 export function DashboardHeader({
   isScrolled,
+  notifications,
   searchQuery,
+  streakCount,
+  user,
   onSearchQueryChange,
 }: DashboardHeaderProps) {
   const router = useRouter();
   const { signOut } = useAuthActions();
-  const user = useQuery(api.users.getCurrentUser);
-  const notifications = [
-    {
-      title: "Lab checkpoint reminder",
-      detail: "COMP1021 is due in 4 hours.",
-    },
-    {
-      title: "New module note shared",
-      detail: "Someone added revision notes for MATH1014.",
-    },
-  ];
 
   const handleSignOut = () => {
     void signOut().then(() => {
       router.push("/login");
     });
   };
+
+  const userInitial = user?.name?.charAt(0).toUpperCase() ?? "U";
 
   return (
     <header
@@ -73,7 +71,7 @@ export function DashboardHeader({
           <Search className="h-5 w-5 shrink-0" />
           <input
             type="search"
-            placeholder="Search notes, modules, deadlines..."
+            placeholder="Search courses, notes, focus items..."
             value={searchQuery}
             onChange={(event) => onSearchQueryChange(event.target.value)}
             className="w-full bg-transparent text-sm font-mono uppercase tracking-[0.14em] placeholder:text-muted-foreground focus:outline-none"
@@ -96,27 +94,38 @@ export function DashboardHeader({
               aria-label="Open notifications"
             >
               <Bell className="h-5 w-5" />
-              <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-orange-500 ring-2 ring-background" />
+              {notifications.length > 0 ? (
+                <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-orange-500 ring-2 ring-background" />
+              ) : null}
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80 p-0">
               <div className="flex flex-col px-2 py-4">
-                {notifications.map((notification, index) => (
-                  <div key={notification.title} className="flex flex-col px-3">
-                    <div className="flex items-start">
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">
-                          {notification.title}
-                        </p>
-                        <p className="text-xs text-muted-foreground normal-case tracking-normal">
-                          {notification.detail}
-                        </p>
+                {notifications.length > 0 ? (
+                  notifications.map((notification, index) => (
+                    <div
+                      key={notification.title}
+                      className="flex flex-col px-3"
+                    >
+                      <div className="flex items-start">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">
+                            {notification.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground normal-case tracking-normal">
+                            {notification.detail}
+                          </p>
+                        </div>
                       </div>
+                      {index < notifications.length - 1 ? (
+                        <DropdownMenuSeparator className="my-3 w-full" />
+                      ) : null}
                     </div>
-                    {index < notifications.length - 1 ? (
-                      <DropdownMenuSeparator className="my-3 w-full" />
-                    ) : null}
+                  ))
+                ) : (
+                  <div className="px-3 text-sm text-muted-foreground">
+                    All caught up for now.
                   </div>
-                ))}
+                )}
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -125,7 +134,7 @@ export function DashboardHeader({
             <summary className="flex h-14 w-14 cursor-pointer list-none items-stretch justify-stretch overflow-hidden border-2 border-foreground bg-background text-lg font-black uppercase shadow-[4px_4px_0_0_rgba(0,0,0,1)] [&::-webkit-details-marker]:hidden">
               {user?.image ? (
                 <Image
-                  alt={user?.name ?? "User profile"}
+                  alt={user.name ?? "User profile"}
                   className="h-full w-full object-cover"
                   height={56}
                   src={user.image}
@@ -133,7 +142,7 @@ export function DashboardHeader({
                 />
               ) : (
                 <span className="flex h-full w-full items-center justify-center">
-                  {user?.name?.charAt(0) ?? userInitial}
+                  {userInitial}
                 </span>
               )}
             </summary>
