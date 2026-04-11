@@ -14,7 +14,18 @@ import {
 import { type FormEvent, useState } from "react";
 
 import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -36,11 +47,15 @@ type ModuleCardsProps = {
 export function ModuleCards({ modules }: ModuleCardsProps) {
   const openModule = (moduleCode: string) => `/module/${moduleCode}`;
   const createFolder = useMutation(api.folders.createFolder);
+  const deleteFolder = useMutation(api.folders.deleteFolder);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [courseName, setCourseName] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [modulePendingDeletion, setModulePendingDeletion] = useState<DashboardModule | null>(null);
+  const [isDeletingModule, setIsDeletingModule] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const resetForm = () => {
     setCourseName("");
@@ -79,6 +94,39 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
         error instanceof Error ? error.message : "Unable to create course.",
       );
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteDialogChange = (open: boolean) => {
+    if (isDeletingModule) {
+      return;
+    }
+
+    if (!open) {
+      setModulePendingDeletion(null);
+      setDeleteError(null);
+    }
+  };
+
+  const handleDeleteModule = async () => {
+    if (!modulePendingDeletion) {
+      return;
+    }
+
+    setIsDeletingModule(true);
+    setDeleteError(null);
+
+    try {
+      await deleteFolder({
+        folderId: modulePendingDeletion.id as Id<"folders">,
+      });
+      setModulePendingDeletion(null);
+    } catch (error) {
+      setDeleteError(
+        error instanceof Error ? error.message : "Unable to delete class.",
+      );
+    } finally {
+      setIsDeletingModule(false);
     }
   };
 
@@ -218,7 +266,14 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
                   <Share2 className="h-4 w-4" />
                   Share
                 </button>
-                <button className="flex items-center gap-2 px-4 py-3 text-left text-sm font-mono uppercase tracking-[0.12em] transition-colors hover:bg-accent">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeleteError(null);
+                    setModulePendingDeletion(module);
+                  }}
+                  className="flex items-center gap-2 px-4 py-3 text-left text-sm font-mono uppercase tracking-[0.12em] transition-colors hover:bg-accent"
+                >
                   <Trash2 className="h-4 w-4" />
                   Delete
                 </button>
@@ -264,6 +319,40 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
           </div>
         ) : null}
       </div>
+
+      <AlertDialog
+        open={modulePendingDeletion !== null}
+        onOpenChange={handleDeleteDialogChange}
+      >
+        <AlertDialogContent className="border-2 border-foreground bg-background shadow-[8px_8px_0_0_rgba(0,0,0,1)]">
+          <AlertDialogHeader className="items-start text-left">
+            <AlertDialogTitle className="text-xl font-black uppercase tracking-[0.12em]">
+              Delete {modulePendingDeletion?.code}?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="font-mono uppercase tracking-[0.08em]">
+              This removes the class and all of its notes, quizzes, and progress.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {deleteError ? (
+            <p className="border-2 border-red-500 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-700">
+              {deleteError}
+            </p>
+          ) : null}
+
+          <AlertDialogFooter className="border-none bg-muted/20">
+            <AlertDialogCancel disabled={isDeletingModule}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteModule}
+              disabled={isDeletingModule}
+              className="border-2 border-foreground bg-foreground text-background shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
+            >
+              {isDeletingModule ? "Deleting..." : "Delete class"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }
