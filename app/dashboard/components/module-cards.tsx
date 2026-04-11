@@ -156,12 +156,12 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
                 ) : null}
               </div>
 
-              <DialogFooter className="border-t-2 border-foreground bg-muted/20">
+              <DialogFooter className="bg-muted/20 px-6 pb-6 pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => handleOpenChange(false)}
-                  disabled={isSubmitting}
+                  className="mr-2"
                 >
                   Cancel
                 </Button>
