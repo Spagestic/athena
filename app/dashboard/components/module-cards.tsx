@@ -191,6 +191,10 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
                   <Settings className="h-4 w-4" />
                   Customize
                 </button>
+                <button className="flex items-center gap-2 border-b-2 border-foreground px-4 py-3 text-left text-sm font-mono uppercase tracking-[0.12em] transition-colors hover:bg-accent">
+                  <Share2 className="h-4 w-4" />
+                  Share
+                </button>
                 <button className="flex items-center gap-2 px-4 py-3 text-left text-sm font-mono uppercase tracking-[0.12em] transition-colors hover:bg-accent">
                   <Trash2 className="h-4 w-4" />
                   Delete
@@ -213,22 +217,23 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
               </div>
             </div>
 
-            <div className="relative z-10 grid grid-cols-2 gap-3">
-              <div className="border-2 border-foreground bg-background px-3 py-3">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                  Notes
-                </p>
-                <p className="mt-2 text-2xl font-black">{module.noteCount}</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="border-2 border-foreground bg-background px-3 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                    Notes
+                  </p>
+                  <p className="mt-2 text-2xl font-black">{module.noteCount}</p>
+                </div>
+                <div className="border-2 border-foreground bg-background px-3 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                    Tasks
+                  </p>
+                  <p className="mt-2 text-2xl font-black">
+                    {module.pendingTasks}
+                  </p>
+                </div>
               </div>
-              <div className="border-2 border-foreground bg-background px-3 py-3">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                  Tasks
-                </p>
-                <p className="mt-2 text-2xl font-black">
-                  {module.pendingTasks}
-                </p>
-              </div>
-            </div>
+            </Link>
           </article>
         ))}
         {modules.length === 0 ? (
