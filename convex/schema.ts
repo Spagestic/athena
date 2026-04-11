@@ -61,6 +61,7 @@ export default defineSchema({
     ownerId: v.id("users"),
     title: v.string(),
     markdownContent: v.optional(v.string()),
+    ocrPageCount: v.optional(v.number()),
     originalFilename: v.optional(v.string()),
     mimeType: v.optional(v.string()),
     storageId: v.optional(v.id("_storage")),

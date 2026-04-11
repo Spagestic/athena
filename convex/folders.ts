@@ -37,6 +37,81 @@ export const createFolder = mutation({
   },
 });
 
+export const deleteFolder = mutation({
+  args: {
+    folderId: v.id("folders"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await requireAuthenticatedUser(ctx);
+    const folder = await ctx.db.get(args.folderId);
+
+    if (!folder) {
+      throw new Error("Course not found");
+    }
+
+    if (folder.ownerId !== userId) {
+      throw new Error("Only the course owner can delete this class.");
+    }
+
+    const notes = await ctx.db
+      .query("notes")
+      .withIndex("by_folder", (q) => q.eq("folderId", args.folderId))
+      .take(1000);
+    for (const note of notes) {
+      await ctx.db.delete(note._id);
+    }
+
+    const quizzes = await ctx.db
+      .query("quizzes")
+      .withIndex("by_folder", (q) => q.eq("folderId", args.folderId))
+      .take(1000);
+    for (const quiz of quizzes) {
+      const questions = await ctx.db
+        .query("quizQuestions")
+        .withIndex("by_quiz", (q) => q.eq("quizId", quiz._id))
+        .take(1000);
+      for (const question of questions) {
+        await ctx.db.delete(question._id);
+      }
+      await ctx.db.delete(quiz._id);
+    }
+
+    const attempts = await ctx.db
+      .query("quizAttempts")
+      .withIndex("by_folder", (q) => q.eq("folderId", args.folderId))
+      .take(1000);
+    for (const attempt of attempts) {
+      const responses = await ctx.db
+        .query("questionResponses")
+        .withIndex("by_attempt", (q) => q.eq("attemptId", attempt._id))
+        .take(1000);
+      for (const response of responses) {
+        await ctx.db.delete(response._id);
+      }
+      await ctx.db.delete(attempt._id);
+    }
+
+    const scores = await ctx.db
+      .query("folderScores")
+      .withIndex("by_folder", (q) => q.eq("folderId", args.folderId))
+      .take(1000);
+    for (const score of scores) {
+      await ctx.db.delete(score._id);
+    }
+
+    const memberships = await ctx.db
+      .query("folderMembers")
+      .withIndex("by_folder", (q) => q.eq("folderId", args.folderId))
+      .take(1000);
+    for (const membership of memberships) {
+      await ctx.db.delete(membership._id);
+    }
+
+    await ctx.db.delete(args.folderId);
+    return { deleted: true };
+  },
+});
+
 async function requireAuthenticatedUser(ctx: MutationCtx) {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {

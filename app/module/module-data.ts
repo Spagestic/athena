@@ -1,6 +1,5 @@
 import {
-  dashboardModules,
-  deadlineTasks,
+  type DashboardUser,
   type DeadlineTask,
 } from "../dashboard/dashboard-data";
 
@@ -24,29 +23,33 @@ export type ModulePerformancePoint = {
 };
 
 export type ModuleNoteRow = {
+  fileUrl: string | null;
   id: string;
-  title: string;
+  lastUpdated: number;
   pages: number;
+  processingStatus: "pending" | "processing" | "ready" | "failed";
   quizzes: number;
-  lastUpdated: string;
   sharedWith: string[];
+  title: string;
 };
 
 export type ModuleTaskRow = DeadlineTask;
 
 export type ModulePageData = {
   code: string;
-  title: string;
-  professor: string;
   description: string;
+  leaderboard: ModuleLeaderboardEntry[];
   noteCount: number;
-  pendingTasks: number;
+  notes: ModuleNoteRow[];
   participantOverflow: number;
   participants: ModuleFriend[];
-  leaderboard: ModuleLeaderboardEntry[];
+  pendingTasks: number;
   performance: ModulePerformancePoint[];
-  notes: ModuleNoteRow[];
+  professor: string;
+  streakCount: number;
   tasks: ModuleTaskRow[];
+  title: string;
+  user: DashboardUser | null;
 };
 
 const performanceTemplate = [
@@ -79,16 +82,23 @@ function buildPerformanceSeries(
   }));
 }
 
-const moduleExtras: Record<
+export const moduleExtras: Record<
   string,
   Omit<
     ModulePageData,
-    "code" | "title" | "professor" | "noteCount" | "pendingTasks" | "tasks"
+    | "code"
+    | "description"
+    | "noteCount"
+    | "notes"
+    | "pendingTasks"
+    | "professor"
+    | "streakCount"
+    | "tasks"
+    | "title"
+    | "user"
   >
 > = {
   COMP1021: {
-    description:
-      "Build a strong foundation in computational thinking through Python, problem solving, and practical lab work.",
     participantOverflow: 24,
     participants: [
       { id: "ava-chen", name: "Ava Chen", initials: "AC" },
@@ -111,36 +121,8 @@ const moduleExtras: Record<
       [16, 18, 21, 24, 29, 34, 39, 43, 47, 51, 53, 55, 57, 59, 61, 63],
       [14, 16, 18, 20, 24, 27, 30, 33, 35, 38, 40, 41, 42, 43, 44, 45],
     ),
-    notes: [
-      {
-        id: "comp-note-1",
-        title: "Variables and control flow recap",
-        pages: 12,
-        quizzes: 3,
-        lastUpdated: "2 hours ago",
-        sharedWith: ["Ava Chen", "Ben Lee"],
-      },
-      {
-        id: "comp-note-2",
-        title: "Functions and recursion summary",
-        pages: 8,
-        quizzes: 2,
-        lastUpdated: "Yesterday",
-        sharedWith: [],
-      },
-      {
-        id: "comp-note-3",
-        title: "Debugging patterns and lab notes",
-        pages: 10,
-        quizzes: 4,
-        lastUpdated: "3 days ago",
-        sharedWith: ["Cora Wong", "Ben Lee", "Taylor Chan"],
-      },
-    ],
   },
   MATH1014: {
-    description:
-      "Strengthen calculus intuition with integration techniques, sequences, and series used across science and engineering.",
     participantOverflow: 18,
     participants: [
       { id: "kai-lau", name: "Kai Lau", initials: "KL" },
@@ -163,36 +145,8 @@ const moduleExtras: Record<
       [18, 20, 23, 27, 31, 35, 40, 44, 47, 50, 51, 53, 54, 56, 57, 58],
       [16, 18, 20, 23, 26, 29, 32, 35, 38, 41, 43, 44, 45, 46, 47, 48],
     ),
-    notes: [
-      {
-        id: "math-note-1",
-        title: "Integration by parts drill sheet",
-        pages: 9,
-        quizzes: 2,
-        lastUpdated: "4 hours ago",
-        sharedWith: ["Kai Lau"],
-      },
-      {
-        id: "math-note-2",
-        title: "Improper integrals checkpoint",
-        pages: 7,
-        quizzes: 1,
-        lastUpdated: "2 days ago",
-        sharedWith: ["Mia Cheung", "Noah Hui"],
-      },
-      {
-        id: "math-note-3",
-        title: "Series convergence quick review",
-        pages: 11,
-        quizzes: 3,
-        lastUpdated: "5 days ago",
-        sharedWith: [],
-      },
-    ],
   },
   PHYS1112: {
-    description:
-      "Study core mechanics and wave concepts through quantitative reasoning, worked examples, and concise revision notes.",
     participantOverflow: 31,
     participants: [
       { id: "leo-chan", name: "Leo Chan", initials: "LC" },
@@ -215,50 +169,9 @@ const moduleExtras: Record<
       [14, 17, 19, 22, 26, 30, 34, 38, 42, 46, 48, 50, 52, 53, 55, 56],
       [13, 15, 17, 19, 22, 25, 28, 31, 34, 37, 39, 41, 42, 43, 44, 46],
     ),
-    notes: [
-      {
-        id: "phys-note-1",
-        title: "Wave motion concept summary",
-        pages: 13,
-        quizzes: 2,
-        lastUpdated: "1 hour ago",
-        sharedWith: ["Leo Chan", "Ivy Tam"],
-      },
-      {
-        id: "phys-note-2",
-        title: "Momentum conservation cheat sheet",
-        pages: 8,
-        quizzes: 3,
-        lastUpdated: "Yesterday",
-        sharedWith: [],
-      },
-      {
-        id: "phys-note-3",
-        title: "Optics formulas one-pager",
-        pages: 6,
-        quizzes: 1,
-        lastUpdated: "4 days ago",
-        sharedWith: ["Zoe Lam"],
-      },
-    ],
   },
 };
 
-export function getModulePageData(moduleCode: string): ModulePageData | null {
-  const normalizedCode = moduleCode.toUpperCase();
-  const courseModule = dashboardModules.find(
-    (item) => item.code === normalizedCode,
-  );
-  const extras = moduleExtras[normalizedCode];
-
-  if (!courseModule || !extras) {
-    return null;
-  }
-
-  return {
-    ...courseModule,
-    ...extras,
-    professor: courseModule.subtitle,
-    tasks: deadlineTasks.filter((task) => task.moduleCode === normalizedCode),
-  };
+export function getModuleExtras(moduleCode: string) {
+  return moduleExtras[moduleCode.toUpperCase()] ?? null;
 }
