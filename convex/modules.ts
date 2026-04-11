@@ -7,6 +7,7 @@ import { action, internalMutation, mutation, query } from "./_generated/server";
 import type { ActionCtx, MutationCtx, QueryCtx } from "./_generated/server";
 import { getCourseLabel, normalizeCourseCode } from "./courseLabels";
 import { runOcrRequest } from "./ocr";
+import { buildTaskId } from "./taskIds";
 
 export const getModuleWorkspace = query({
   args: {
@@ -366,7 +367,7 @@ function buildFolderTasks(
   if (notes.length === 0) {
     tasks.push({
       dueLabel: "No materials added yet",
-      id: `${folder._id}-upload-first-note`,
+      id: buildTaskId(folder._id, code, "upload-first-note"),
       moduleCode: code,
       progress: 44,
       signalScore: 76,
@@ -379,7 +380,7 @@ function buildFolderTasks(
     if (note.processingStatus === "failed") {
       tasks.push({
         dueLabel: "Import needs attention",
-        id: `${note._id}-retry-ingestion`,
+        id: buildTaskId(folder._id, note._id, code, "retry-ingestion"),
         moduleCode: code,
         progress: 12,
         signalScore: 96,
@@ -394,7 +395,7 @@ function buildFolderTasks(
     ) {
       tasks.push({
         dueLabel: "Material still processing",
-        id: `${note._id}-processing`,
+        id: buildTaskId(folder._id, note._id, code, "processing"),
         moduleCode: code,
         progress: 38,
         signalScore: 74,
@@ -407,7 +408,7 @@ function buildFolderTasks(
   if (quizzes.length === 0 && notes.some((note) => note.processingStatus === "ready")) {
     tasks.push({
       dueLabel: "Ready notes are waiting",
-      id: `${folder._id}-generate-quiz`,
+      id: buildTaskId(folder._id, code, "generate-quiz"),
       moduleCode: code,
       progress: 52,
       signalScore: 70,
@@ -421,7 +422,7 @@ function buildFolderTasks(
     if (!latestAttempt) {
       tasks.push({
         dueLabel: "No quiz attempt yet",
-        id: `${quiz._id}-start-quiz`,
+        id: buildTaskId(folder._id, quiz._id, code, "start-quiz"),
         moduleCode: code,
         progress: 56,
         signalScore: 68,
@@ -437,7 +438,7 @@ function buildFolderTasks(
     ) {
       tasks.push({
         dueLabel: "Previous attempt unfinished",
-        id: `${quiz._id}-resume-quiz`,
+        id: buildTaskId(folder._id, quiz._id, code, "resume-quiz"),
         moduleCode: code,
         progress: 20,
         signalScore: 90,

@@ -25,6 +25,7 @@ import type * as mistral from "../mistral.js";
 import type * as modules from "../modules.js";
 import type * as notes from "../notes.js";
 import type * as ocr from "../ocr.js";
+import type * as taskIds from "../taskIds.js";
 import type * as users from "../users.js";
 
 import type {
@@ -51,6 +52,7 @@ declare const fullApi: ApiFromModules<{
   modules: typeof modules;
   notes: typeof notes;
   ocr: typeof ocr;
+  taskIds: typeof taskIds;
   users: typeof users;
 }>;
 
