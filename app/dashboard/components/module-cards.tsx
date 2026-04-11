@@ -1,4 +1,11 @@
-import { BookCopy, MoreHorizontal, Settings, Trash2 } from "lucide-react";
+import Link from "next/link";
+import {
+  BookCopy,
+  MoreHorizontal,
+  Settings,
+  Share2,
+  Trash2,
+} from "lucide-react";
 
 import { type DashboardModule } from "../dashboard-data";
 
@@ -15,7 +22,7 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
             Modules
           </p>
           <h2 className="text-3xl font-black uppercase md:text-4xl">
-            Your classes
+            Your Modules
           </h2>
         </div>
         <button className="border-2 border-foreground bg-background px-4 py-3 text-sm font-mono uppercase tracking-[0.12em] shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5">
@@ -40,6 +47,10 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
                   <Settings className="h-4 w-4" />
                   Customize
                 </button>
+                <button className="flex items-center gap-2 border-b-2 border-foreground px-4 py-3 text-left text-sm font-mono uppercase tracking-[0.12em] transition-colors hover:bg-accent">
+                  <Share2 className="h-4 w-4" />
+                  Share
+                </button>
                 <button className="flex items-center gap-2 px-4 py-3 text-left text-sm font-mono uppercase tracking-[0.12em] transition-colors hover:bg-accent">
                   <Trash2 className="h-4 w-4" />
                   Delete
@@ -47,37 +58,42 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
               </div>
             </details>
 
-            <div className="relative z-10 space-y-4 pr-12">
-              <div className="inline-flex items-center gap-2 border border-foreground bg-primary text-primary-foreground px-3 py-2 text-xs font-bold uppercase tracking-[0.2em]">
-                <BookCopy className="h-4 w-4" />
-                {module.code}
+            <Link
+              href={`/module/${module.code}`}
+              className="relative z-10 flex h-full flex-col justify-between gap-6"
+            >
+              <div className="space-y-4 pr-12">
+                <div className="inline-flex items-center gap-2 border border-foreground bg-primary px-3 py-2 text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground">
+                  <BookCopy className="h-4 w-4" />
+                  {module.code}
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-black uppercase leading-tight">
+                    {module.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {module.professor}
+                  </p>
+                </div>
               </div>
-              <div className="space-y-2">
-                <h3 className="text-2xl font-black uppercase leading-tight">
-                  {module.title}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {module.professor}
-                </p>
-              </div>
-            </div>
 
-            <div className="relative z-10 grid grid-cols-2 gap-3">
-              <div className="border-2 border-foreground bg-background px-3 py-3">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                  Notes
-                </p>
-                <p className="mt-2 text-2xl font-black">{module.noteCount}</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="border-2 border-foreground bg-background px-3 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                    Notes
+                  </p>
+                  <p className="mt-2 text-2xl font-black">{module.noteCount}</p>
+                </div>
+                <div className="border-2 border-foreground bg-background px-3 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                    Tasks
+                  </p>
+                  <p className="mt-2 text-2xl font-black">
+                    {module.pendingTasks}
+                  </p>
+                </div>
               </div>
-              <div className="border-2 border-foreground bg-background px-3 py-3">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                  Tasks
-                </p>
-                <p className="mt-2 text-2xl font-black">
-                  {module.pendingTasks}
-                </p>
-              </div>
-            </div>
+            </Link>
           </article>
         ))}
         {modules.length === 0 ? (
