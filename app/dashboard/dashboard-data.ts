@@ -25,6 +25,7 @@ export type DashboardUser = {
 };
 
 export type DashboardNotification = {
+  id: string;
   title: string;
   detail: string;
 };

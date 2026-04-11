@@ -93,6 +93,15 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
       return;
     }
 
+    if (
+      modules.some(
+        (module) => module.code.trim().toUpperCase() === trimmedCode,
+      )
+    ) {
+      setFormError("A course with that code already exists.");
+      return;
+    }
+
     setIsSubmitting(true);
     setFormError(null);
 
