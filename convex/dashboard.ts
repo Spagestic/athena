@@ -2,6 +2,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 
 import type { Doc, Id } from "./_generated/dataModel";
 import { query, type QueryCtx } from "./_generated/server";
+import { getCourseLabel } from "./courseLabels";
 
 export const getDashboard = query({
   args: {},
@@ -115,7 +116,7 @@ async function getFolderEntry(
   ]);
 
   const tasks = buildFolderTasks(folder, notes, quizzes, latestAttemptsByQuiz);
-  const { code, title } = parseCourseLabel(folder.name);
+  const { code, title } = getCourseLabel(folder);
   const collaboratorCount = new Set(members.map((member) => member.userId)).size;
   const isOwner = folder.ownerId === currentUserId;
   const subtitle =
@@ -145,7 +146,7 @@ function buildFolderTasks(
   quizzes: Doc<"quizzes">[],
   latestAttemptsByQuiz: Map<string, Doc<"quizAttempts">>,
 ) {
-  const { code } = parseCourseLabel(folder.name);
+  const { code } = getCourseLabel(folder);
   const tasks: Array<{
     id: string;
     title: string;
@@ -237,28 +238,3 @@ function buildFolderTasks(
   return tasks.slice(0, 3);
 }
 
-function parseCourseLabel(name: string) {
-  const [maybeCode, ...rest] = name.split(/\s[-–—]\s/);
-  if (rest.length > 0 && looksLikeCourseCode(maybeCode)) {
-    return {
-      code: maybeCode.toUpperCase(),
-      title: rest.join(" - "),
-    };
-  }
-
-  const fallbackCode = name
-    .split(/\s+/)
-    .map((part) => part[0] ?? "")
-    .join("")
-    .slice(0, 6)
-    .toUpperCase();
-
-  return {
-    code: fallbackCode || "COURSE",
-    title: name,
-  };
-}
-
-function looksLikeCourseCode(value: string) {
-  return /^[A-Za-z]{2,}\d{1,}[A-Za-z0-9-]*$/.test(value.replace(/\s+/g, ""));
-}
