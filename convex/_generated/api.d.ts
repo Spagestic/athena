@@ -21,6 +21,7 @@ import type * as firecrawl_search from "../firecrawl/search.js";
 import type * as folders from "../folders.js";
 import type * as http from "../http.js";
 import type * as mistral from "../mistral.js";
+import type * as modules from "../modules.js";
 import type * as ocr from "../ocr.js";
 import type * as users from "../users.js";
 
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   folders: typeof folders;
   http: typeof http;
   mistral: typeof mistral;
+  modules: typeof modules;
   ocr: typeof ocr;
   users: typeof users;
 }>;

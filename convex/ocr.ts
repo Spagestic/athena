@@ -107,6 +107,63 @@ async function readJson(response: Response) {
   }
 }
 
+export async function runOcrRequest(args: {
+  model?: string;
+  document?: DocumentInput;
+  tableFormat?: "html" | "markdown" | null;
+  table_format?: "html" | "markdown" | null;
+  extractHeader?: boolean;
+  extract_header?: boolean;
+  extractFooter?: boolean;
+  extract_footer?: boolean;
+  includeImageBase64?: boolean;
+  include_image_base64?: boolean;
+}): Promise<OcrResult> {
+  const document = normalizeDocument(args.document);
+
+  if (!document) {
+    throw new Error(
+      'Provide document.type and a valid documentUrl/imageUrl. Example: { "document": { "type": "document_url", "documentUrl": "https://..." } }',
+    );
+  }
+
+  const payload = {
+    model: args.model ?? "mistral-ocr-latest",
+    document,
+    table_format: args.table_format ?? args.tableFormat ?? null,
+    extract_header: args.extract_header ?? args.extractHeader ?? false,
+    extract_footer: args.extract_footer ?? args.extractFooter ?? false,
+    include_image_base64:
+      args.include_image_base64 ?? args.includeImageBase64 ?? false,
+  };
+
+  try {
+    const response = await fetch("https://api.mistral.ai/v1/ocr", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getApiKey()}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await readJson(response);
+
+    if (!response.ok) {
+      throw new Error(
+        typeof data === "object" && data && "error" in data
+          ? String((data as { error?: unknown }).error)
+          : "Mistral OCR request failed",
+      );
+    }
+
+    return data as OcrResult;
+  } catch (error) {
+    console.error("Mistral OCR action error:", error);
+    throw new Error("Failed to reach Mistral OCR API");
+  }
+}
+
 export const ocr = action({
   args: {
     model: v.optional(v.string()),
@@ -138,48 +195,6 @@ export const ocr = action({
     include_image_base64: v.optional(v.boolean()),
   },
   handler: async (_ctx, args): Promise<OcrResult> => {
-    const document = normalizeDocument(args.document);
-
-    if (!document) {
-      throw new Error(
-        'Provide document.type and a valid documentUrl/imageUrl. Example: { "document": { "type": "document_url", "documentUrl": "https://..." } }',
-      );
-    }
-
-    const payload = {
-      model: args.model ?? "mistral-ocr-latest",
-      document,
-      table_format: args.table_format ?? args.tableFormat ?? null,
-      extract_header: args.extract_header ?? args.extractHeader ?? false,
-      extract_footer: args.extract_footer ?? args.extractFooter ?? false,
-      include_image_base64:
-        args.include_image_base64 ?? args.includeImageBase64 ?? false,
-    };
-
-    try {
-      const response = await fetch("https://api.mistral.ai/v1/ocr", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getApiKey()}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await readJson(response);
-
-      if (!response.ok) {
-        throw new Error(
-          typeof data === "object" && data && "error" in data
-            ? String((data as { error?: unknown }).error)
-            : "Mistral OCR request failed",
-        );
-      }
-
-      return data as OcrResult;
-    } catch (error) {
-      console.error("Mistral OCR action error:", error);
-      throw new Error("Failed to reach Mistral OCR API");
-    }
+    return await runOcrRequest(args);
   },
 });

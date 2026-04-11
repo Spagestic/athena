@@ -1,14 +1,36 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useMutation } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { Bell, Flame, LogOut, Search, Settings, ArrowLeft } from "lucide-react";
+import {
+  Bell,
+  Flame,
+  LogOut,
+  Search,
+  Settings,
+  ArrowLeft,
+  Trash2,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import {
   type DashboardNotification,
   type DashboardUser,
 } from "@/app/dashboard/dashboard-data";
+import { api } from "@/convex/_generated/api";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +40,7 @@ import {
 
 type DashboardHeaderProps = {
   isScrolled: boolean;
+  moduleCode?: string;
   notifications?: DashboardNotification[];
   searchQuery: string;
   streakCount: number;
@@ -27,6 +50,7 @@ type DashboardHeaderProps = {
 
 export function ModuleHeader({
   isScrolled,
+  moduleCode,
   notifications,
   searchQuery,
   streakCount,
@@ -34,13 +58,29 @@ export function ModuleHeader({
   onSearchQueryChange,
 }: DashboardHeaderProps) {
   const router = useRouter();
+  const deleteFolder = useMutation(api.folders.deleteFolder);
   const { signOut } = useAuthActions();
+  const [isDeleting, setIsDeleting] = useState(false);
   const safeNotifications = notifications ?? [];
 
   const handleSignOut = () => {
     void signOut().then(() => {
       router.push("/login");
     });
+  };
+
+  const handleDeleteClass = async () => {
+    if (!moduleCode) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await deleteFolder({ folderId: moduleCode as never });
+      router.push("/dashboard");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const userInitial = user?.name?.charAt(0).toUpperCase() ?? "U";
@@ -150,6 +190,34 @@ export function ModuleHeader({
                 <Settings className="h-4 w-4" />
                 Setting
               </button>
+              {moduleCode ? (
+                <AlertDialog>
+                  <AlertDialogTrigger className="flex items-center gap-2 border-b-2 border-foreground px-4 py-3 text-left text-sm font-mono uppercase tracking-[0.12em] transition-colors hover:bg-accent">
+                    <Trash2 className="h-4 w-4" />
+                    Delete class
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete this class?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently remove the class and all of its
+                        notes, quizzes, scores, and progress data.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={isDeleting}>
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => void handleDeleteClass()}
+                        disabled={isDeleting}
+                      >
+                        {isDeleting ? "Deleting..." : "Delete"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              ) : null}
               <button
                 type="button"
                 onClick={handleSignOut}

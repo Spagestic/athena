@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Check, Pencil, X } from "lucide-react";
+import { useAction, useMutation } from "convex/react";
+import { useEffect, useId, useState } from "react";
+import { Check, Loader2, Pencil, Upload, X } from "lucide-react";
 
+import { api } from "@/convex/_generated/api";
+import { Button } from "@/components/ui/button";
 import { ModuleHeader } from "./module-header";
 import { ModuleLeaderboard } from "./module-leaderboard";
 import { ModulePerformanceCard } from "./module-performance-card";
@@ -14,10 +17,16 @@ type ModulePageShellProps = {
 };
 
 export function ModulePageShell({ module }: ModulePageShellProps) {
+  const fileInputId = useId();
+  const generateUploadUrl = useMutation(api.modules.generateUploadUrl);
+  const createUploadedNote = useMutation(api.modules.createUploadedNote);
+  const processUploadedNote = useAction(api.modules.processUploadedNote);
   const [isScrolled, setIsScrolled] = useState(false);
   const [description, setDescription] = useState(module.description);
   const [draftDescription, setDraftDescription] = useState(module.description);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,14 +56,70 @@ export function ModulePageShell({ module }: ModulePageShellProps) {
     setIsEditingDescription(false);
   };
 
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const uploadUrl = await generateUploadUrl({});
+      const uploadResponse = await fetch(uploadUrl, {
+        body: file,
+        headers: {
+          "Content-Type": file.type || "application/octet-stream",
+        },
+        method: "POST",
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const { storageId } = (await uploadResponse.json()) as {
+        storageId?: string;
+      };
+      if (!storageId) {
+        throw new Error("Storage upload did not return a file id");
+      }
+
+      const createdNote = await createUploadedNote({
+        mimeType: file.type || undefined,
+        moduleCode: module.code,
+        originalFilename: file.name,
+        storageId: storageId as never,
+        title: file.name.replace(/\.[^.]+$/, ""),
+      });
+
+      await processUploadedNote({
+        documentUrl: createdNote.documentUrl,
+        noteId: createdNote.noteId,
+      });
+    } catch (error) {
+      setUploadError(
+        error instanceof Error ? error.message : "Unable to upload this file.",
+      );
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground dot-grid-bg">
       <ModuleHeader
         isScrolled={isScrolled}
+        moduleCode={module.code}
         notifications={[]}
         searchQuery=""
-        streakCount={0}
-        user={null}
+        streakCount={module.streakCount}
+        user={module.user}
         onSearchQueryChange={() => undefined}
       />
 
@@ -141,9 +206,70 @@ export function ModulePageShell({ module }: ModulePageShellProps) {
                 </div>
               </div>
 
-              <div className="border-2 border-foreground bg-background px-4 py-3 text-sm font-mono uppercase tracking-[0.14em] shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
-                {module.noteCount} notes / {module.pendingTasks} active tasks /{" "}
-                {module.professor}
+              <div className="flex flex-col items-stretch gap-3 md:items-end">
+                <div className="border-2 border-foreground bg-background px-4 py-3 text-sm font-mono uppercase tracking-[0.14em] shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
+                  {module.noteCount} notes / {module.pendingTasks} active tasks
+                  / {module.professor}
+                </div>
+                <div className="w-full max-w-md border-2 border-foreground bg-background p-4 shadow-[4px_4px_0_0_rgba(0,0,0,1)] md:min-w-[24rem]">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                        Upload materials
+                      </p>
+                      <p className="mt-1 text-sm font-medium">
+                        Add a PDF or document and Athena will extract the text
+                        automatically.
+                      </p>
+                    </div>
+                    {isUploading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : null}
+                  </div>
+                  <input
+                    id={fileInputId}
+                    type="file"
+                    accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.md,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain,text/markdown"
+                    onChange={handleFileUpload}
+                    disabled={isUploading}
+                    className="sr-only"
+                  />
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                    <label htmlFor={fileInputId} className="flex-1">
+                      <Button
+                        type="button"
+                        disabled={isUploading}
+                        className="w-full border-2 border-foreground bg-foreground text-background shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
+                      >
+                        <span className="flex items-center justify-center gap-2">
+                          {isUploading ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Uploading + OCR...
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="h-4 w-4" />
+                              Choose File
+                            </>
+                          )}
+                        </span>
+                      </Button>
+                    </label>
+                    <div className="flex items-center border-2 border-foreground bg-card px-3 py-2 text-[10px] font-mono uppercase tracking-[0.12em] text-muted-foreground">
+                      PDF, DOCX, PPTX, TXT, MD
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs font-mono uppercase tracking-[0.12em] text-muted-foreground">
+                    Uploaded files are saved to Convex storage, then OCR content
+                    is written back into your notes.
+                  </p>
+                  {uploadError ? (
+                    <p className="mt-3 border-2 border-red-500 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-700">
+                      {uploadError}
+                    </p>
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>

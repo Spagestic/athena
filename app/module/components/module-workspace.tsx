@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MoreHorizontal } from "lucide-react";
+import { Download, Loader2, TriangleAlert } from "lucide-react";
 
 import {
   HoverCard,
@@ -23,6 +23,31 @@ const urgencyClasses: Record<ModuleTaskRow["urgency"], string> = {
   medium: "bg-orange-400 text-black",
   low: "bg-lime-400 text-black",
 };
+
+const processingStatusClasses: Record<ModuleNoteRow["processingStatus"], string> = {
+  failed: "bg-red-500 text-white",
+  pending: "bg-zinc-300 text-black",
+  processing: "bg-orange-400 text-black",
+  ready: "bg-lime-400 text-black",
+};
+
+function formatLastUpdated(timestamp: number) {
+  const deltaMs = Date.now() - timestamp;
+  const deltaHours = Math.floor(deltaMs / (1000 * 60 * 60));
+  const deltaDays = Math.floor(deltaHours / 24);
+
+  if (deltaHours < 1) {
+    return "Just now";
+  }
+  if (deltaHours < 24) {
+    return `${deltaHours} hour${deltaHours === 1 ? "" : "s"} ago`;
+  }
+  if (deltaDays < 7) {
+    return `${deltaDays} day${deltaDays === 1 ? "" : "s"} ago`;
+  }
+
+  return new Date(timestamp).toLocaleDateString();
+}
 
 export function ModuleWorkspace({ notes, tasks }: ModuleWorkspaceProps) {
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("notes");
@@ -69,7 +94,7 @@ export function ModuleWorkspace({ notes, tasks }: ModuleWorkspaceProps) {
                   Quizzes
                 </th>
                 <th className="w-28 border-b-2 border-r-2 border-foreground px-3 py-3 text-left text-xs font-bold uppercase tracking-[0.16em]">
-                  Shared
+                  Status
                 </th>
                 <th className="w-32 border-b-2 border-r-2 border-foreground px-3 py-3 text-left text-xs font-bold uppercase tracking-[0.16em]">
                   Last updated
@@ -92,43 +117,68 @@ export function ModuleWorkspace({ notes, tasks }: ModuleWorkspaceProps) {
                     {note.quizzes}
                   </td>
                   <td className="border-r-2 border-t-2 border-foreground px-3 py-3">
-                    {note.sharedWith.length > 0 ? (
-                      <HoverCard>
-                        <HoverCardTrigger>
-                          <span className="inline-flex border border-foreground bg-primary px-2 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary-foreground">
-                            Shared
-                          </span>
-                        </HoverCardTrigger>
-                        <HoverCardContent
-                          side="top"
-                          align="start"
-                          sideOffset={10}
-                          className="w-56 rounded-none border-2 border-foreground bg-background px-3 py-2 shadow-[4px_4px_0_0_rgba(0,0,0,1)] ring-0"
+                    <HoverCard>
+                      <HoverCardTrigger>
+                        <span
+                          className={`inline-flex border border-foreground px-2 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${processingStatusClasses[note.processingStatus]}`}
                         >
-                          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                            Shared with
-                          </p>
-                          <p className="mt-1 text-sm font-mono uppercase tracking-[0.12em]">
-                            {note.sharedWith.join(", ")}
-                          </p>
-                        </HoverCardContent>
-                      </HoverCard>
-                    ) : (
-                      <span className="border border-foreground bg-background px-2 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                        Private
-                      </span>
-                    )}
+                          {note.processingStatus}
+                        </span>
+                      </HoverCardTrigger>
+                      <HoverCardContent
+                        side="top"
+                        align="start"
+                        sideOffset={10}
+                        className="w-56 rounded-none border-2 border-foreground bg-background px-3 py-2 shadow-[4px_4px_0_0_rgba(0,0,0,1)] ring-0"
+                      >
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                          Note status
+                        </p>
+                        <p className="mt-1 text-sm font-mono uppercase tracking-[0.12em]">
+                          {note.processingStatus === "ready"
+                            ? "OCR complete and markdown saved."
+                            : note.processingStatus === "failed"
+                              ? "OCR failed. Re-upload to retry."
+                              : "Athena is extracting text right now."}
+                        </p>
+                      </HoverCardContent>
+                    </HoverCard>
                   </td>
                   <td className="border-r-2 border-t-2 border-foreground px-3 py-3 text-sm font-mono uppercase tracking-[0.12em] text-muted-foreground">
-                    {note.lastUpdated}
+                    {formatLastUpdated(note.lastUpdated)}
                   </td>
                   <td className="border-t-2 border-foreground px-3 py-3">
-                    <button className="flex h-10 w-10 items-center justify-center border-2 border-foreground bg-background shadow-[3px_3px_0_0_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </button>
+                    {note.fileUrl ? (
+                      <a
+                        href={note.fileUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex h-10 w-10 items-center justify-center border-2 border-foreground bg-background shadow-[3px_3px_0_0_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5"
+                      >
+                        <Download className="h-4 w-4" />
+                      </a>
+                    ) : note.processingStatus === "failed" ? (
+                      <div className="flex h-10 w-10 items-center justify-center border-2 border-foreground bg-background text-red-500 shadow-[3px_3px_0_0_rgba(0,0,0,1)]">
+                        <TriangleAlert className="h-4 w-4" />
+                      </div>
+                    ) : (
+                      <div className="flex h-10 w-10 items-center justify-center border-2 border-foreground bg-background shadow-[3px_3px_0_0_rgba(0,0,0,1)]">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
+              {notes.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="border-t-2 border-foreground px-3 py-6 text-sm font-mono uppercase tracking-[0.14em] text-muted-foreground"
+                  >
+                    No notes uploaded yet.
+                  </td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
         ) : (
