@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 
-const ease = [0.22, 1, 0.36, 1] as const
+const ease = [0.22, 1, 0.36, 1] as const;
 
 const PARTNERS = [
   "OPENAI",
@@ -15,7 +15,7 @@ const PARTNERS = [
   "STABILITY",
   "DEEPMIND",
   "HUGGING FACE",
-]
+];
 
 function LogoBlock({ name, glitch }: { name: string; glitch: boolean }) {
   return (
@@ -28,11 +28,11 @@ function LogoBlock({ name, glitch }: { name: string; glitch: boolean }) {
         {name}
       </span>
     </div>
-  )
+  );
 }
 
 export function GlitchMarquee() {
-  const glitchIndices = [2, 6]
+  const glitchIndices = [2, 6];
 
   return (
     <section className="w-full py-16 px-6 lg:px-12">
@@ -48,7 +48,9 @@ export function GlitchMarquee() {
           {"// PARTNERS: MODEL_ECOSYSTEM"}
         </span>
         <div className="flex-1 border-t border-border" />
-        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">008</span>
+        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+          008
+        </span>
       </motion.div>
 
       {/* Marquee */}
@@ -70,5 +72,5 @@ export function GlitchMarquee() {
         </div>
       </motion.div>
     </section>
-  )
+  );
 }

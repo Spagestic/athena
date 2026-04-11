@@ -1,6 +1,7 @@
 import { Navbar } from "@/app/(landing)/components/navbar";
 import { HeroSection } from "@/app/(landing)/components/hero-section";
 import { FeatureGrid } from "@/app/(landing)/components/feature-grid";
+import { FeatureDemo } from "@/app/(landing)/components/feature-demo";
 import { AboutSection } from "@/app/(landing)/components/about-section";
 import { PricingSection } from "@/app/(landing)/components/pricing-section";
 import { GlitchMarquee } from "@/app/(landing)/components/glitch-marquee";
@@ -12,9 +13,16 @@ export default function Page() {
       <Navbar />
       <main>
         <HeroSection />
-        <FeatureGrid />
-        <AboutSection />
-        <PricingSection />
+        <section id="features">
+          <FeatureGrid />
+          <FeatureDemo />
+        </section>
+        <section id="about">
+          <AboutSection />
+        </section>
+        <section id="pricing">
+          <PricingSection />
+        </section>
         <GlitchMarquee />
       </main>
       <Footer />
