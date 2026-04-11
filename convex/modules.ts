@@ -530,18 +530,40 @@ async function generateQuestionsFromMarkdown(
 }
 
 function buildPerformanceSeries(attempts: Doc<"quizAttempts">[]) {
-  const base = [180, 150, 120, 90, 60, 45, 30, 21, 14, 7, 6, 5, 4, 3, 2, 1];
   const completedCount = attempts.filter(
     (attempt) => attempt.status === "completed",
   ).length;
+  const extendedDays = [180, 150, 120, 90, 60, 45, ...Array.from({ length: 30 }, (_, index) => 30 - index)];
+  const baseUser = 34 + completedCount * 3;
+  const baseAggregate = 30 + Math.max(2, completedCount);
 
-  return base.map((daysAgo, index) => ({
-    aggregate: 18 + index * 2,
-    daysAgo,
-    fullLabel: `${daysAgo} days ago`,
-    label: daysAgo >= 30 ? `${Math.round(daysAgo / 30)}M` : `${daysAgo}D`,
-    user: Math.max(12, 20 + completedCount * 4 + index * 3),
-  }));
+  return extendedDays.map((daysAgo, index) => {
+    const wave = Math.sin((index + completedCount) * 0.72) * 4.8;
+    const rebound = Math.cos((index + completedCount) * 0.33) * 2.6;
+    const aggregateWave = Math.cos((index + completedCount) * 0.47) * 2.4;
+    const recentDrop = daysAgo <= 7 ? (8 - daysAgo) * 2.8 : 0;
+    const user = Math.max(
+      14,
+      Math.round(baseUser + index * 0.9 + wave + rebound - recentDrop),
+    );
+    const aggregate = Math.max(
+      16,
+      Math.round(baseAggregate + index * 0.8 + aggregateWave + 6),
+    );
+
+    return {
+      aggregate,
+      daysAgo,
+      fullLabel: `${daysAgo} days ago`,
+      label:
+        daysAgo >= 60
+          ? `${Math.round(daysAgo / 30)}M`
+          : daysAgo > 30
+            ? `${daysAgo}D`
+            : `${daysAgo}`,
+      user,
+    };
+  });
 }
 
 function buildFolderTasks(

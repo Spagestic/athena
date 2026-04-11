@@ -1,4 +1,4 @@
-import { TrendingUp } from "lucide-react";
+import { TrendingDown, TrendingUp } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 
@@ -32,7 +32,7 @@ const chartConfig = {
   },
   aggregate: {
     label: "Agg. anon perf.",
-    color: "var(--chart-2)",
+    color: "var(--chart-3)",
   },
 } satisfies ChartConfig;
 
@@ -64,6 +64,7 @@ export function ModulePerformanceCard({
 
     return Math.round(((lastPoint.user - firstPoint.user) / firstPoint.user) * 100);
   }, [filteredPerformance]);
+  const trendDirection = trendDelta >= 0 ? "up" : "down";
 
   return (
     <Card className="gap-0 rounded-none border-2 border-foreground bg-card py-0 shadow-[4px_4px_0_0_rgba(0,0,0,1)] ring-0">
@@ -168,7 +169,12 @@ export function ModulePerformanceCard({
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-1">
             <div className="flex items-center gap-2 font-medium uppercase">
-              Trending up by {trendDelta}% <TrendingUp className="h-4 w-4" />
+              Trending {trendDirection} by {Math.abs(trendDelta)}%{" "}
+              {trendDirection === "up" ? (
+                <TrendingUp className="h-4 w-4" />
+              ) : (
+                <TrendingDown className="h-4 w-4" />
+              )}
             </div>
             <div className="font-mono text-xs uppercase tracking-[0.12em] text-muted-foreground">
               Comparing your selected time window against the anonymous class average
