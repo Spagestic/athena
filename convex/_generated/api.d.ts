@@ -22,6 +22,7 @@ import type * as folders from "../folders.js";
 import type * as http from "../http.js";
 import type * as mistral from "../mistral.js";
 import type * as modules from "../modules.js";
+import type * as notes from "../notes.js";
 import type * as ocr from "../ocr.js";
 import type * as users from "../users.js";
 
@@ -46,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   mistral: typeof mistral;
   modules: typeof modules;
+  notes: typeof notes;
   ocr: typeof ocr;
   users: typeof users;
 }>;
