@@ -156,7 +156,7 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
                 ) : null}
               </div>
 
-              <DialogFooter className="bg-muted/20 px-6 pb-6 pt-4">
+              <DialogFooter className="border-none bg-muted/20 px-6 pb-6 pt-4">
                 <Button
                   type="button"
                   variant="outline"
