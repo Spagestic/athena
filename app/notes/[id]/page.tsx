@@ -72,13 +72,14 @@ export default function NotePage() {
         } as CSSProperties
       }
     >
-      <NotesChatSidebar note={note} />
+      <NotesChatSidebar note={note} quiz={noteRecord.quiz} />
       <SidebarInset className="min-h-screen bg-transparent">
         <NotesPageContent
           fileUrl={noteRecord.fileUrl}
           mimeType={noteRecord.mimeType}
           note={note}
           markdownContent={noteRecord.markdownContent}
+          processingStatus={noteRecord.processingStatus}
         />
       </SidebarInset>
     </SidebarProvider>

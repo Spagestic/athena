@@ -6,7 +6,26 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { action, internalMutation, mutation, query } from "./_generated/server";
 import type { ActionCtx, MutationCtx, QueryCtx } from "./_generated/server";
 import { getCourseLabel, normalizeCourseCode } from "./courseLabels";
+import { requestChatCompletion } from "./mistral";
 import { runOcrRequest } from "./ocr";
+
+type GeneratedMcq = {
+  prompt: string;
+  choices: [string, string, string, string];
+  correctIndex: number;
+  explanation: string;
+  conceptTag?: string;
+};
+
+const generatedMcqValidator = v.object({
+  choices: v.array(v.string()),
+  conceptTag: v.optional(v.string()),
+  correctIndex: v.number(),
+  explanation: v.string(),
+  prompt: v.string(),
+});
+
+const OCR_SUPPORTED_EXTENSIONS = [".pdf", ".pptx"] as const;
 
 export const getModuleWorkspace = query({
   args: {
@@ -107,6 +126,12 @@ export const createUploadedNote = mutation({
       throw new Error("Module not found");
     }
 
+    if (!isSupportedOcrUpload(args.originalFilename)) {
+      throw new Error(
+        "Mistral OCR currently supports PDF and PPTX uploads in this workflow.",
+      );
+    }
+
     const documentUrl = await ctx.storage.getUrl(args.storageId);
     if (!documentUrl) {
       throw new Error("Uploaded file could not be read from storage");
@@ -150,7 +175,12 @@ export const processUploadedNote = action({
         .filter(Boolean)
         .join("\n\n---\n\n");
 
+      const generatedQuestions = markdownContent
+        ? await generateQuestionsFromMarkdown(markdownContent)
+        : [];
+
       await ctx.runMutation(internal.modules.saveOcrSuccess, {
+        generatedQuestions,
         markdownContent,
         noteId: args.noteId,
         ocrPageCount: result.pages.length,
@@ -173,17 +203,67 @@ export const processUploadedNote = action({
 
 export const saveOcrSuccess = internalMutation({
   args: {
+    generatedQuestions: v.array(generatedMcqValidator),
     markdownContent: v.string(),
     noteId: v.id("notes"),
     ocrPageCount: v.number(),
   },
   handler: async (ctx, args) => {
+    const note = await ctx.db.get(args.noteId);
+    if (!note) {
+      throw new Error("Note not found");
+    }
+
+    const now = Date.now();
     await ctx.db.patch(args.noteId, {
       markdownContent: args.markdownContent,
       ocrPageCount: args.ocrPageCount,
       processingStatus: "ready",
-      updatedAt: Date.now(),
+      updatedAt: now,
     });
+
+    const existingQuizzes = await ctx.db
+      .query("quizzes")
+      .withIndex("by_note", (q) => q.eq("noteId", args.noteId))
+      .collect();
+
+    for (const quiz of existingQuizzes) {
+      const existingQuestions = await ctx.db
+        .query("quizQuestions")
+        .withIndex("by_quiz", (q) => q.eq("quizId", quiz._id))
+        .collect();
+
+      for (const question of existingQuestions) {
+        await ctx.db.delete(question._id);
+      }
+
+      await ctx.db.delete(quiz._id);
+    }
+
+    if (args.generatedQuestions.length === 0) {
+      return;
+    }
+
+    const quizId = await ctx.db.insert("quizzes", {
+      createdAt: now,
+      creatorId: note.ownerId,
+      folderId: note.folderId,
+      noteId: args.noteId,
+      title: `${note.title} Practice Quiz`,
+      updatedAt: now,
+    });
+
+    for (const [index, question] of args.generatedQuestions.entries()) {
+      await ctx.db.insert("quizQuestions", {
+        choices: question.choices,
+        conceptTag: question.conceptTag,
+        correctIndex: question.correctIndex,
+        explanation: question.explanation,
+        order: index,
+        prompt: question.prompt,
+        quizId,
+      });
+    }
   },
 });
 
@@ -321,6 +401,131 @@ function buildLeaderboard(scores: Doc<"folderScores">[], currentUserName: string
     name: index === 0 ? currentUserName : `Learner ${index + 1}`,
     streakCount: Math.max(1, Math.round(score.points / 20)),
   }));
+}
+
+function isSupportedOcrUpload(filename: string) {
+  const lowerName = filename.toLowerCase();
+  return OCR_SUPPORTED_EXTENSIONS.some((extension) =>
+    lowerName.endsWith(extension),
+  );
+}
+
+async function generateQuestionsFromMarkdown(
+  markdownContent: string,
+): Promise<GeneratedMcq[]> {
+  const response = await requestChatCompletion({
+    model: "mistral-large-latest",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You generate grounded multiple choice questions from OCR study notes. Return only high-quality questions answerable from the provided content. Avoid trivial wording, keep exactly 4 choices per question, and make distractors plausible.",
+      },
+      {
+        role: "user",
+        content: `Create 5 multiple choice questions from this OCR markdown.\n\nReturn JSON only.\n\n${markdownContent.slice(0, 24_000)}`,
+      },
+    ],
+    responseFormat: {
+      type: "json_schema",
+      json_schema: {
+        name: "generated_mcq_set",
+        strict: true,
+        schema: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            questions: {
+              type: "array",
+              minItems: 3,
+              maxItems: 5,
+              items: {
+                type: "object",
+                additionalProperties: false,
+                properties: {
+                  prompt: { type: "string" },
+                  choices: {
+                    type: "array",
+                    minItems: 4,
+                    maxItems: 4,
+                    items: { type: "string" },
+                  },
+                  correctIndex: {
+                    type: "integer",
+                    minimum: 0,
+                    maximum: 3,
+                  },
+                  explanation: { type: "string" },
+                  conceptTag: { type: "string" },
+                },
+                required: ["prompt", "choices", "correctIndex", "explanation"],
+              },
+            },
+          },
+          required: ["questions"],
+        },
+      },
+    },
+  });
+
+  const content = response.choices[0]?.message.content;
+  if (!content) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(content) as {
+      questions?: Array<{
+        prompt?: unknown;
+        choices?: unknown;
+        correctIndex?: unknown;
+        explanation?: unknown;
+        conceptTag?: unknown;
+      }>;
+    };
+
+    if (!Array.isArray(parsed.questions)) {
+      return [];
+    }
+
+    const generatedQuestions: GeneratedMcq[] = [];
+
+    for (const question of parsed.questions) {
+      if (
+        typeof question.prompt !== "string" ||
+        !Array.isArray(question.choices) ||
+        question.choices.length !== 4 ||
+        question.choices.some((choice) => typeof choice !== "string") ||
+        typeof question.correctIndex !== "number" ||
+        question.correctIndex < 0 ||
+        question.correctIndex > 3 ||
+        typeof question.explanation !== "string"
+      ) {
+        continue;
+      }
+
+      generatedQuestions.push({
+        choices: [
+          question.choices[0],
+          question.choices[1],
+          question.choices[2],
+          question.choices[3],
+        ] as [string, string, string, string],
+        conceptTag:
+          typeof question.conceptTag === "string"
+            ? question.conceptTag
+            : undefined,
+        correctIndex: question.correctIndex,
+        explanation: question.explanation,
+        prompt: question.prompt,
+      });
+    }
+
+    return generatedQuestions;
+  } catch (error) {
+    console.error("Failed to parse generated quiz questions:", error);
+    return [];
+  }
 }
 
 function buildPerformanceSeries(attempts: Doc<"quizAttempts">[]) {

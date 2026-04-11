@@ -107,6 +107,33 @@ async function readJson(response: Response) {
   }
 }
 
+function getOcrErrorMessage(data: unknown) {
+  if (!data || typeof data !== "object") {
+    return "Mistral OCR request failed";
+  }
+
+  if ("message" in data && typeof data.message === "string") {
+    return data.message;
+  }
+
+  if ("error" in data) {
+    const errorValue = (data as { error?: unknown }).error;
+    if (typeof errorValue === "string") {
+      return errorValue;
+    }
+    if (
+      errorValue &&
+      typeof errorValue === "object" &&
+      "message" in errorValue &&
+      typeof (errorValue as { message?: unknown }).message === "string"
+    ) {
+      return (errorValue as { message: string }).message;
+    }
+  }
+
+  return "Mistral OCR request failed";
+}
+
 export async function runOcrRequest(args: {
   model?: string;
   document?: DocumentInput;
@@ -150,17 +177,15 @@ export async function runOcrRequest(args: {
     const data = await readJson(response);
 
     if (!response.ok) {
-      throw new Error(
-        typeof data === "object" && data && "error" in data
-          ? String((data as { error?: unknown }).error)
-          : "Mistral OCR request failed",
-      );
+      throw new Error(getOcrErrorMessage(data));
     }
 
     return data as OcrResult;
   } catch (error) {
     console.error("Mistral OCR action error:", error);
-    throw new Error("Failed to reach Mistral OCR API");
+    throw error instanceof Error
+      ? error
+      : new Error("Failed to reach Mistral OCR API");
   }
 }
 

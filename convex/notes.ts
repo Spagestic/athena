@@ -25,10 +25,21 @@ export const getNote = query({
       return null;
     }
 
-    const [folder, fileUrl] = await Promise.all([
+    const [folder, fileUrl, quiz] = await Promise.all([
       ctx.db.get(note.folderId),
       note.storageId ? ctx.storage.getUrl(note.storageId) : Promise.resolve(null),
+      ctx.db
+        .query("quizzes")
+        .withIndex("by_note", (q) => q.eq("noteId", note._id))
+        .first(),
     ]);
+
+    const questions = quiz
+      ? await ctx.db
+          .query("quizQuestions")
+          .withIndex("by_quiz", (q) => q.eq("quizId", quiz._id))
+          .collect()
+      : [];
 
     return {
       code: folder ? parseCourseLabel(folder.name).code : "NOTE",
@@ -39,6 +50,21 @@ export const getNote = query({
       originalFilename: note.originalFilename ?? null,
       processingError: note.processingError ?? null,
       processingStatus: note.processingStatus,
+      quiz: quiz
+        ? {
+            id: quiz._id,
+            title: quiz.title,
+            questions: questions.map((question) => ({
+              choices: question.choices,
+              conceptTag: question.conceptTag ?? null,
+              correctIndex: question.correctIndex,
+              explanation: question.explanation ?? null,
+              id: question._id,
+              order: question.order,
+              prompt: question.prompt,
+            })),
+          }
+        : null,
       title: note.title,
       updatedAt: note.updatedAt,
     };

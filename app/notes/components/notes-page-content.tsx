@@ -10,6 +10,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2 } from "lucide-react";
 import type { NoteTemplate } from "./note-page-data";
 
 export function NotesPageContent({
@@ -17,13 +18,18 @@ export function NotesPageContent({
   fileUrl,
   markdownContent,
   mimeType,
+  processingStatus,
 }: {
   note: NoteTemplate;
   fileUrl: string | null;
   markdownContent: string;
   mimeType: string | null;
+  processingStatus: "pending" | "processing" | "ready" | "failed";
 }) {
   const hasPdfDocument = Boolean(fileUrl) && mimeType === "application/pdf";
+  const isMarkdownLoading =
+    !markdownContent &&
+    (processingStatus === "pending" || processingStatus === "processing");
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground dot-grid-bg">
@@ -72,44 +78,51 @@ export function NotesPageContent({
               </TabsTrigger>
             </TabsList>
 
-            {markdownContent ? (
-              <>
-                <TabsContent value="doc" className="mt-2 min-h-0 flex-1">
-                  {hasPdfDocument && fileUrl ? (
-                    <div className="h-full overflow-hidden border-2 border-foreground bg-background">
-                      <iframe
-                        src={fileUrl}
-                        title={`${note.title} PDF`}
-                        className="h-full w-full"
-                      />
-                    </div>
+            <TabsContent value="doc" className="mt-2 min-h-0 flex-1">
+              {hasPdfDocument && fileUrl ? (
+                <div className="h-full overflow-hidden border-2 border-foreground bg-background">
+                  <iframe
+                    src={fileUrl}
+                    title={`${note.title} PDF`}
+                    className="h-full w-full"
+                  />
+                </div>
+              ) : (
+                <div className="h-full border-2 border-dashed border-foreground bg-background px-4 py-5 text-sm font-medium text-muted-foreground">
+                  {fileUrl ? (
+                    <>
+                      This note&apos;s original file is not a PDF, so it
+                      can&apos;t be embedded here.
+                    </>
                   ) : (
-                    <div className="h-full border-2 border-dashed border-foreground bg-background px-4 py-5 text-sm font-medium text-muted-foreground">
-                      {fileUrl ? (
-                        <>
-                          This note&apos;s original file is not a PDF, so it
-                          can&apos;t be embedded here.
-                        </>
-                      ) : (
-                        "No source document is available for this note yet."
-                      )}
-                    </div>
+                    "No source document is available for this note yet."
                   )}
-                </TabsContent>
+                </div>
+              )}
+            </TabsContent>
 
-                <TabsContent value="markdown" className="mt-2 min-h-0 flex-1">
-                  <ScrollArea className="h-full border-2 border-foreground bg-background">
-                    <pre className="p-4 text-sm leading-6 whitespace-pre-wrap wrap-break-word">
-                      <code>{markdownContent}</code>
-                    </pre>
-                  </ScrollArea>
-                </TabsContent>
-              </>
-            ) : (
-              <div className="mt-2 border-2 border-dashed border-foreground bg-background px-4 py-5 text-sm font-medium text-muted-foreground">
-                No extracted markdown is available for this note yet.
-              </div>
-            )}
+            <TabsContent value="markdown" className="mt-2 min-h-0 flex-1">
+              {markdownContent ? (
+                <ScrollArea className="h-full border-2 border-foreground bg-background">
+                  <pre className="p-4 text-sm leading-6 whitespace-pre-wrap wrap-break-word">
+                    <code>{markdownContent}</code>
+                  </pre>
+                </ScrollArea>
+              ) : isMarkdownLoading ? (
+                <div className="flex h-full items-center justify-center border-2 border-dashed border-foreground bg-background px-4 py-5">
+                  <div className="flex flex-col items-center gap-3 text-center">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Extracting markdown from your note...
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="h-full border-2 border-dashed border-foreground bg-background px-4 py-5 text-sm font-medium text-muted-foreground">
+                  No extracted markdown is available for this note yet.
+                </div>
+              )}
+            </TabsContent>
           </Tabs>
         </section>
       </main>

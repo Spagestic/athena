@@ -58,6 +58,20 @@ type ToolUIPart = {
   errorText?: string;
 };
 
+type NoteQuiz = {
+  id: string;
+  title: string;
+  questions: Array<{
+    id: string;
+    prompt: string;
+    choices: string[];
+    correctIndex: number;
+    explanation: string | null;
+    conceptTag: string | null;
+    order: number;
+  }>;
+} | null;
+
 function getToolSourceItems(result: unknown): ToolSource[] {
   if (!result || typeof result !== "object") return [];
 
@@ -186,8 +200,15 @@ function getMessageText(parts: { type: string; text?: string }[]) {
     .trim();
 }
 
-export function NotesChatSidebar({ note }: { note: NoteTemplate }) {
+export function NotesChatSidebar({
+  note,
+  quiz,
+}: {
+  note: NoteTemplate;
+  quiz: NoteQuiz;
+}) {
   const [prompt, setPrompt] = useState("");
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
 
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
@@ -216,6 +237,9 @@ export function NotesChatSidebar({ note }: { note: NoteTemplate }) {
       // Ignore clipboard failures so chat interactions never break.
     }
   };
+
+  const quizQuestions = quiz?.questions ?? [];
+  const hasQuizQuestions = quizQuestions.length > 0;
 
   return (
     <Sidebar side="right">
@@ -370,16 +394,107 @@ export function NotesChatSidebar({ note }: { note: NoteTemplate }) {
           </TabsContent>
 
           <TabsContent value="quiz" className="mt-0 flex min-h-0 flex-1 flex-col p-4">
-            <div className="flex min-h-0 flex-1 flex-col border-2 border-dashed border-foreground bg-background px-5 py-6 shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
-              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                Quiz mode
-              </p>
-              <h3 className="mt-2 text-base font-semibold text-foreground">
-                Practice questions coming soon
-              </h3>
-              <p className="mt-3 max-w-prose text-sm font-medium leading-6 text-muted-foreground">
-                Switch back to chat to ask Athena questions about this note.
-              </p>
+            <div className="flex min-h-0 flex-1 flex-col border-2 border-foreground bg-background shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
+              <div className="border-b-2 border-foreground px-5 py-4">
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                  Quiz mode
+                </p>
+                <h3 className="mt-2 text-base font-semibold text-foreground">
+                  {quiz?.title ?? `${note.title} Practice Quiz`}
+                </h3>
+              </div>
+
+              <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+                {hasQuizQuestions ? (
+                  <div className="space-y-6">
+                    {quizQuestions
+                      .slice()
+                      .sort((a, b) => a.order - b.order)
+                      .map((question, questionIndex) => {
+                        const selectedIndex = selectedAnswers[question.id];
+                        const hasAnswered = selectedIndex !== undefined;
+
+                        return (
+                          <section
+                            key={question.id}
+                            className="space-y-3 border-2 border-foreground bg-sidebar px-4 py-4 shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
+                          >
+                            <div className="space-y-2">
+                              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                                Question {questionIndex + 1}
+                              </p>
+                              <p className="text-sm font-semibold leading-6 text-foreground">
+                                {question.prompt}
+                              </p>
+                              {question.conceptTag ? (
+                                <p className="text-[11px] font-mono font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                                  {question.conceptTag}
+                                </p>
+                              ) : null}
+                            </div>
+
+                            <div className="space-y-2">
+                              {question.choices.map((choice, choiceIndex) => {
+                                const isSelected = selectedIndex === choiceIndex;
+                                const isCorrect = question.correctIndex === choiceIndex;
+                                const showCorrectState = hasAnswered && isCorrect;
+                                const showIncorrectState = isSelected && hasAnswered && !isCorrect;
+
+                                return (
+                                  <button
+                                    key={`${question.id}-${choiceIndex}`}
+                                    type="button"
+                                    onClick={() =>
+                                      setSelectedAnswers((current) => ({
+                                        ...current,
+                                        [question.id]: choiceIndex,
+                                      }))
+                                    }
+                                    className={cn(
+                                      "flex w-full items-start gap-3 border-2 px-3 py-3 text-left text-sm font-medium transition-colors",
+                                      showCorrectState
+                                        ? "border-green-600 bg-green-100 text-green-950"
+                                        : showIncorrectState
+                                          ? "border-red-600 bg-red-100 text-red-950"
+                                          : isSelected
+                                            ? "border-foreground bg-accent"
+                                            : "border-foreground bg-background hover:bg-accent",
+                                    )}
+                                  >
+                                    <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                                      {String.fromCharCode(65 + choiceIndex)}
+                                    </span>
+                                    <span className="flex-1 leading-6">{choice}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+
+                            {hasAnswered ? (
+                              <div className="border-2 border-foreground bg-background px-3 py-3 text-sm leading-6 text-foreground">
+                                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                                  {selectedIndex === question.correctIndex
+                                    ? "Correct"
+                                    : "Review"}
+                                </p>
+                                <p className="mt-2">
+                                  {question.explanation ??
+                                    `The correct answer is ${String.fromCharCode(65 + question.correctIndex)}.`}
+                                </p>
+                              </div>
+                            ) : null}
+                          </section>
+                        );
+                      })}
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-foreground bg-background px-4 py-5 text-sm font-medium text-muted-foreground">
+                    {quiz === null
+                      ? "MCQs will appear here after OCR finishes and the note quiz is generated."
+                      : "This note does not have practice questions yet."}
+                  </div>
+                )}
+              </div>
             </div>
           </TabsContent>
         </SidebarContent>

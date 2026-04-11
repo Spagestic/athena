@@ -84,6 +84,55 @@ function normalizeMessages(messages: MistralChatMessage[]) {
   });
 }
 
+type ChatCompleteArgs = {
+  model?: string;
+  messages: MistralChatMessage[];
+  safe_prompt?: boolean;
+  stop?: string[];
+  responseFormat?: MistralResponseFormat;
+};
+
+export async function requestChatCompletion(
+  args: ChatCompleteArgs,
+): Promise<MistralChatResult> {
+  const payload = {
+    model: args.model ?? "mistral-large-latest",
+    messages: normalizeMessages(args.messages),
+    ...(args.safe_prompt !== undefined ? { safe_prompt: args.safe_prompt } : {}),
+    ...(args.stop !== undefined ? { stop: args.stop } : {}),
+    ...(args.responseFormat !== undefined
+      ? { response_format: args.responseFormat }
+      : {}),
+  };
+
+  try {
+    const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${getApiKey()}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await readJson(response);
+
+    if (!response.ok) {
+      throw new Error(
+        typeof data === "object" && data && "error" in data
+          ? String((data as { error?: unknown }).error)
+          : "Mistral chat completion request failed",
+      );
+    }
+
+    return data as MistralChatResult;
+  } catch (error) {
+    console.error("Mistral chat completion action error:", error);
+    throw new Error("Failed to reach Mistral chat completions API");
+  }
+}
+
 export const chatComplete = action({
   args: {
     model: v.optional(v.string()),
@@ -105,47 +154,12 @@ export const chatComplete = action({
     stop: v.optional(v.array(v.string())),
     responseFormat: v.optional(v.any()),
   },
-  handler: async (_ctx, args): Promise<MistralChatResult> => {
-    const payload = {
-      model: args.model ?? "mistral-large-latest",
-      messages: normalizeMessages(args.messages),
-      ...(args.safe_prompt !== undefined
-        ? { safe_prompt: args.safe_prompt }
-        : {}),
-      ...(args.stop !== undefined ? { stop: args.stop } : {}),
-      ...(args.responseFormat !== undefined
-        ? { response_format: args.responseFormat as MistralResponseFormat }
-        : {}),
-    };
-
-    try {
-      const response = await fetch(
-        "https://api.mistral.ai/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${getApiKey()}`,
-          },
-          body: JSON.stringify(payload),
-        },
-      );
-
-      const data = await readJson(response);
-
-      if (!response.ok) {
-        throw new Error(
-          typeof data === "object" && data && "error" in data
-            ? String((data as { error?: unknown }).error)
-            : "Mistral chat completion request failed",
-        );
-      }
-
-      return data as MistralChatResult;
-    } catch (error) {
-      console.error("Mistral chat completion action error:", error);
-      throw new Error("Failed to reach Mistral chat completions API");
-    }
-  },
+  handler: async (_ctx, args): Promise<MistralChatResult> =>
+    requestChatCompletion({
+      model: args.model,
+      messages: args.messages,
+      responseFormat: args.responseFormat as MistralResponseFormat | undefined,
+      safe_prompt: args.safe_prompt,
+      stop: args.stop,
+    }),
 });

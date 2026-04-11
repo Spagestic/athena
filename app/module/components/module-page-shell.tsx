@@ -105,7 +105,7 @@ export function ModulePageShell({ module }: ModulePageShellProps) {
   };
 
   const validateUploadFile = (file: File) => {
-    const allowedExtensions = [".pdf", ".doc", ".docx", ".ppt", ".pptx", ".txt", ".md"];
+    const allowedExtensions = [".pdf", ".pptx"];
     const lowerName = file.name.toLowerCase();
     const hasAllowedExtension = allowedExtensions.some((extension) =>
       lowerName.endsWith(extension),
@@ -114,7 +114,7 @@ export function ModulePageShell({ module }: ModulePageShellProps) {
     if (!hasAllowedExtension) {
       return {
         code: "INVALID_FILE_TYPE",
-        message: "Please upload a PDF, DOCX, PPTX, TXT, or Markdown file.",
+        message: "Please upload a PDF or PPTX file.",
       };
     }
 
