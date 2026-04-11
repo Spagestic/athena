@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Download, Loader2, TriangleAlert, Upload } from "lucide-react";
 
@@ -73,6 +74,7 @@ export function ModuleWorkspace({
   onUploadFile,
   validateUploadFile,
 }: ModuleWorkspaceProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("notes");
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
@@ -188,7 +190,19 @@ export function ModuleWorkspace({
             </thead>
             <tbody>
               {notes.map((note) => (
-                <tr key={note.id} className="bg-card">
+                <tr
+                  key={note.id}
+                  role="link"
+                  tabIndex={0}
+                  onClick={() => router.push(`/notes/${note.id}`)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      router.push(`/notes/${note.id}`);
+                    }
+                  }}
+                  className="cursor-pointer bg-card transition-colors hover:bg-accent/40 focus:outline-none focus-visible:bg-accent/40"
+                >
                   <td className="border-r-2 border-t-2 border-foreground px-3 py-3 text-sm font-medium">
                     {note.title}
                   </td>
@@ -235,6 +249,7 @@ export function ModuleWorkspace({
                         href={note.fileUrl}
                         target="_blank"
                         rel="noreferrer"
+                        onClick={(event) => event.stopPropagation()}
                         className="flex h-10 w-10 items-center justify-center border-2 border-foreground bg-background shadow-[3px_3px_0_0_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5"
                       >
                         <Download className="h-4 w-4" />
