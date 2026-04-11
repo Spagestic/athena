@@ -509,141 +509,136 @@ function StatBlock({
 export function AboutSection() {
   return (
     <section className="w-full px-6 py-20 lg:px-12">
-      {/* Section label */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.5, ease: entrance }}
-        className="flex items-center gap-4 mb-8"
-      >
-        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
-          {"// SECTION: ABOUT_ATHENA"}
-        </span>
-        <div className="flex-1 border-t border-border" />
-        <BlinkDot />
-        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
-          005
-        </span>
-      </motion.div>
-
-      {/* Two-column layout */}
-      <div className="flex flex-col lg:flex-row gap-0 border-2 border-foreground">
-        {/* Left: Image */}
+      <div className="mx-auto max-w-7xl">
+        {/* Section label */}
         <motion.div
-          initial={{ opacity: 0, x: -30, filter: "blur(6px)" }}
-          whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.7, ease: entrance }}
-          className="relative w-full lg:w-1/2 min-h-75 lg:min-h-125 border-b-2 lg:border-b-0 lg:border-r-2 border-foreground overflow-hidden bg-[#111]"
-        >
-          {/* Illustration label overlay */}
-          <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 bg-black/80 backdrop-blur-sm">
-            <span className="text-[10px] tracking-[0.2em] uppercase text-white/60 font-mono">
-              RENDER: ATHENA_NOTEBOOK.UI
-            </span>
-            <span className="text-[10px] tracking-[0.2em] uppercase text-[#ea580c] font-mono">
-              LIVE
-            </span>
-          </div>
-
-          {/* SVG wireframe notebook illustration */}
-          <NotebookIllustration />
-
-          {/* Bottom label */}
-          <div className="absolute bottom-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 bg-black/80 backdrop-blur-sm">
-            <span className="text-[10px] tracking-[0.2em] uppercase text-white/40 font-mono">
-              ATHENA.STUDIO
-            </span>
-            <span className="text-[10px] tracking-[0.2em] uppercase text-white/40 font-mono">
-              NOTEBOOK.v1
-            </span>
-          </div>
-        </motion.div>
-
-        {/* Right: Content */}
-        <motion.div
-          initial={{ opacity: 0, x: 30 }}
+          initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.7, delay: 0.1, ease: entrance }}
-          className="flex flex-col w-full lg:w-1/2"
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5, ease: entrance }}
+          className="mb-8 flex items-center gap-4"
         >
-          {/* Header bar */}
-          <div className="flex items-center justify-between px-5 py-3 border-b-2 border-foreground">
-            <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
-              MANIFEST.md
-            </span>
-            <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
-              v3.1.0
-            </span>
-          </div>
-
-          {/* Content body */}
-          <div className="flex-1 flex flex-col justify-between px-5 py-6 lg:py-8">
-            <div className="flex flex-col gap-6">
-              <motion.h2
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-30px" }}
-                transition={{ duration: 0.5, delay: 0.2, ease: entrance }}
-                className="text-2xl lg:text-3xl font-mono font-bold tracking-tight uppercase text-balance"
-              >
-                Infrastructure built for
-                <br />
-                <span className="text-[#ea580c]">deep understanding</span>
-              </motion.h2>
-
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-30px" }}
-                transition={{ delay: 0.3, duration: 0.5, ease: entrance }}
-                className="flex flex-col gap-4"
-              >
-                <p className="text-xs lg:text-sm font-mono text-muted-foreground leading-relaxed">
-                  Two medical students. Hundreds of pages of dense material. No
-                  good tools to actually retain it. So we built AthenaΓÇöan AI
-                  workspace that turns any source into something you can
-                  actually understand and remember.
-                </p>
-                <p className="text-xs lg:text-sm font-mono text-muted-foreground leading-relaxed">
-                  Used by 300,000+ learners, educators, researchers, and
-                  professionals in 106+ countries.
-                </p>
-              </motion.div>
-
-              {/* Uptime line */}
-              <motion.div
-                initial={{ opacity: 0, scaleX: 0.8 }}
-                whileInView={{ opacity: 1, scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4, duration: 0.5, ease: entrance }}
-                style={{ transformOrigin: "left" }}
-                className="flex items-center gap-3 py-3 border-t-2 border-b-2 border-foreground"
-              >
-                <span className="h-1.5 w-1.5 bg-[#ea580c]" />
-                <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
-                  NOTEBOOKS CREATED TODAY:
-                </span>
-                <NotebooksCounter />
-              </motion.div>
-            </div>
-
-            {/* Stats grid */}
-            <div className="grid grid-cols-2 gap-0 mt-6">
-              {STATS.map((stat, i) => (
-                <StatBlock
-                  key={stat.label}
-                  label={stat.label}
-                  value={stat.value}
-                  suffix={stat.suffix}
-                  index={i}
-                />
-              ))}
-            </div>
-          </div>
+          <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
+            {"// SECTION: ABOUT_ATHENA"}
+          </span>
+          <div className="flex-1 border-t border-border" />
+          <BlinkDot />
+          <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
+            005
+          </span>
         </motion.div>
+
+        {/* Two-column layout */}
+        <div className="flex flex-col gap-0 border-2 border-foreground lg:flex-row">
+          {/* Left: Image */}
+          <motion.div
+            initial={{ opacity: 0, x: -30, filter: "blur(6px)" }}
+            whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.7, ease: entrance }}
+            className="relative min-h-75 w-full overflow-hidden border-foreground border-b-2 bg-[#111] lg:min-h-125 lg:w-1/2 lg:border-r-2 lg:border-b-0"
+          >
+            <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between bg-black/80 px-4 py-2 backdrop-blur-sm">
+              <span className="text-[10px] tracking-[0.2em] uppercase text-white/60 font-mono">
+                RENDER: ATHENA_NOTEBOOK.UI
+              </span>
+              <span className="text-[10px] tracking-[0.2em] uppercase text-[#ea580c] font-mono">
+                LIVE
+              </span>
+            </div>
+
+            <NotebookIllustration />
+
+            <div className="absolute bottom-0 left-0 right-0 z-10 flex items-center justify-between bg-black/80 px-4 py-2 backdrop-blur-sm">
+              <span className="text-[10px] tracking-[0.2em] uppercase text-white/40 font-mono">
+                ATHENA.STUDIO
+              </span>
+              <span className="text-[10px] tracking-[0.2em] uppercase text-white/40 font-mono">
+                NOTEBOOK.v1
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Right: Content */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.7, delay: 0.1, ease: entrance }}
+            className="flex w-full flex-col lg:w-1/2"
+          >
+            <div className="flex items-center justify-between border-b-2 border-foreground px-5 py-3">
+              <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
+                MANIFEST.md
+              </span>
+              <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
+                v3.1.0
+              </span>
+            </div>
+
+            <div className="flex flex-1 flex-col justify-between px-5 py-6 lg:py-8">
+              <div className="flex flex-col gap-6">
+                <motion.h2
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-30px" }}
+                  transition={{ duration: 0.5, delay: 0.2, ease: entrance }}
+                  className="text-2xl font-mono font-bold tracking-tight uppercase text-balance lg:text-3xl"
+                >
+                  Infrastructure built for
+                  <br />
+                  <span className="text-[#ea580c]">deep understanding</span>
+                </motion.h2>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-30px" }}
+                  transition={{ delay: 0.3, duration: 0.5, ease: entrance }}
+                  className="flex flex-col gap-4"
+                >
+                  <p className="text-xs font-mono leading-relaxed text-muted-foreground lg:text-sm">
+                    Two medical students. Hundreds of pages of dense material. No
+                    good tools to actually retain it. So we built AthenaΓÇöan AI
+                    workspace that turns any source into something you can
+                    actually understand and remember.
+                  </p>
+                  <p className="text-xs font-mono leading-relaxed text-muted-foreground lg:text-sm">
+                    Used by 300,000+ learners, educators, researchers, and
+                    professionals in 106+ countries.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scaleX: 0.8 }}
+                  whileInView={{ opacity: 1, scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4, duration: 0.5, ease: entrance }}
+                  style={{ transformOrigin: "left" }}
+                  className="flex items-center gap-3 border-t-2 border-b-2 border-foreground py-3"
+                >
+                  <span className="h-1.5 w-1.5 bg-[#ea580c]" />
+                  <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
+                    NOTEBOOKS CREATED TODAY:
+                  </span>
+                  <NotebooksCounter />
+                </motion.div>
+              </div>
+
+              <div className="mt-6 grid grid-cols-2 gap-0">
+                {STATS.map((stat, i) => (
+                  <StatBlock
+                    key={stat.label}
+                    label={stat.label}
+                    value={stat.value}
+                    suffix={stat.suffix}
+                    index={i}
+                  />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );

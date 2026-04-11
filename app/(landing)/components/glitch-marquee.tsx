@@ -35,42 +35,43 @@ export function GlitchMarquee() {
   const glitchIndices = [2, 6];
 
   return (
-    <section className="w-full py-16 px-6 lg:px-12">
-      {/* Section label */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.5, ease }}
-        className="flex items-center gap-4 mb-8"
-      >
-        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
-          {"// PARTNERS: MODEL_ECOSYSTEM"}
-        </span>
-        <div className="flex-1 border-t border-border" />
-        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
-          008
-        </span>
-      </motion.div>
+    <section className="w-full px-6 py-16 lg:px-12">
+      <div className="mx-auto max-w-7xl">
+        {/* Section label */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5, ease }}
+          className="mb-8 flex items-center gap-4"
+        >
+          <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+            {"// PARTNERS: MODEL_ECOSYSTEM"}
+          </span>
+          <div className="flex-1 border-t border-border" />
+          <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+            008
+          </span>
+        </motion.div>
 
-      {/* Marquee */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-40px" }}
-        transition={{ duration: 0.6, ease }}
-        className="overflow-hidden border-2 border-foreground"
-      >
-        <div className="flex animate-marquee" style={{ width: "max-content" }}>
-          {[...PARTNERS, ...PARTNERS].map((name, i) => (
-            <LogoBlock
-              key={`${name}-${i}`}
-              name={name}
-              glitch={glitchIndices.includes(i % PARTNERS.length)}
-            />
-          ))}
-        </div>
-      </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.6, ease }}
+          className="overflow-hidden border-2 border-foreground"
+        >
+          <div className="flex animate-marquee" style={{ width: "max-content" }}>
+            {[...PARTNERS, ...PARTNERS].map((name, i) => (
+              <LogoBlock
+                key={`${name}-${i}`}
+                name={name}
+                glitch={glitchIndices.includes(i % PARTNERS.length)}
+              />
+            ))}
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 }

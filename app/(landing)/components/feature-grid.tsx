@@ -20,66 +20,68 @@ const cardVariants = {
 export function FeatureGrid() {
   return (
     <section className="w-full px-6 py-20 lg:px-12">
-      {/* Section label */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.5, ease }}
-        className="flex items-center gap-4 mb-8"
-      >
-        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
-          {"// SECTION: RAW_DATA"}
-        </span>
-        <div className="flex-1 border-t border-border" />
-        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
-          004
-        </span>
-      </motion.div>
-
-      {/* 2x2 Bento Grid */}
-      <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-60px" }}
-        className="grid grid-cols-1 md:grid-cols-2 border-2 border-foreground"
-      >
-        {/* Terminal */}
+      <div className="mx-auto max-w-7xl">
+        {/* Section label */}
         <motion.div
-          custom={0}
-          variants={cardVariants}
-          className="border-b-2 md:border-b-0 md:border-r-2 border-foreground min-h-[280px]"
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5, ease }}
+          className="mb-8 flex items-center gap-4"
         >
-          <TerminalCard />
+          <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+            {"// SECTION: RAW_DATA"}
+          </span>
+          <div className="flex-1 border-t border-border" />
+          <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+            004
+          </span>
         </motion.div>
 
-        {/* Dither */}
+        {/* 2x2 Bento Grid */}
         <motion.div
-          custom={1}
-          variants={cardVariants}
-          className="border-b-2 md:border-b-0 border-foreground min-h-[280px]"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          className="grid grid-cols-1 border-2 border-foreground md:grid-cols-2"
         >
-          <DitherCard />
-        </motion.div>
+          {/* Terminal */}
+          <motion.div
+            custom={0}
+            variants={cardVariants}
+            className="min-h-[280px] border-b-2 border-foreground md:border-r-2 md:border-b-0"
+          >
+            <TerminalCard />
+          </motion.div>
 
-        {/* Metrics */}
-        <motion.div
-          custom={2}
-          variants={cardVariants}
-          className="border-t-2 md:border-r-2 border-foreground min-h-[280px]"
-        >
-          <MetricsCard />
-        </motion.div>
+          {/* Dither */}
+          <motion.div
+            custom={1}
+            variants={cardVariants}
+            className="min-h-[280px] border-b-2 border-foreground md:border-b-0"
+          >
+            <DitherCard />
+          </motion.div>
 
-        {/* Status */}
-        <motion.div
-          custom={3}
-          variants={cardVariants}
-          className="border-t-2 border-foreground min-h-[280px]"
-        >
-          <StatusCard />
+          {/* Metrics */}
+          <motion.div
+            custom={2}
+            variants={cardVariants}
+            className="min-h-[280px] border-t-2 border-foreground md:border-r-2"
+          >
+            <MetricsCard />
+          </motion.div>
+
+          {/* Status */}
+          <motion.div
+            custom={3}
+            variants={cardVariants}
+            className="min-h-[280px] border-t-2 border-foreground"
+          >
+            <StatusCard />
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   );
 }

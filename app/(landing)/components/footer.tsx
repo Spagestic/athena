@@ -15,7 +15,7 @@ export function Footer() {
       transition={{ duration: 0.6, ease: entrance }}
       className="w-full border-t-2 border-foreground px-6 py-8 lg:px-12"
     >
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 md:flex-row md:items-center">
         <div className="flex flex-col gap-1">
           <span className="text-xs font-mono tracking-[0.15em] uppercase font-bold text-foreground">
             ATHENA
@@ -37,7 +37,7 @@ export function Footer() {
                 duration: 0.4,
                 ease: entrance,
               }}
-              className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+              className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground transition-colors duration-200 hover:text-foreground"
             >
               {link}
             </motion.a>

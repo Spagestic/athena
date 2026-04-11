@@ -134,7 +134,7 @@ function WireframeStudio() {
             key={label}
             className="flex items-center gap-1 px-1.5 py-1 border border-white/20 bg-white/5 text-[9px] text-white/70"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-white/30 flex-shrink-0" />
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white/30" />
             <span className="truncate">{label}</span>
             {icon && (
               <span className="ml-auto text-white/40 text-[9px]">{icon}</span>
@@ -453,7 +453,7 @@ function WireframeTutor() {
       <div className="flex-1 flex flex-col gap-3 px-4 py-3">
         {/* AI message */}
         <div className="flex items-start gap-2">
-          <div className="w-6 h-6 bg-[#ea580c]/20 border border-[#ea580c]/40 flex items-center justify-center flex-shrink-0 text-[8px] text-[#ea580c]">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center border border-[#ea580c]/40 bg-[#ea580c]/20 text-[8px] text-[#ea580c]">
             AI
           </div>
           <div className="bg-[#111] border border-white/10 px-2.5 py-2 text-white/80 leading-snug max-w-[85%]">
@@ -469,7 +469,7 @@ function WireframeTutor() {
         </div>
         {/* user message */}
         <div className="flex items-start gap-2 flex-row-reverse">
-          <div className="w-6 h-6 bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0 text-[8px] text-white/50">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center border border-white/20 bg-white/10 text-[8px] text-white/50">
             ME
           </div>
           <div className="bg-[#181818] border border-white/10 px-2.5 py-2 text-white/70 max-w-[85%]">
@@ -480,7 +480,7 @@ function WireframeTutor() {
         </div>
         {/* AI typing */}
         <div className="flex items-start gap-2">
-          <div className="w-6 h-6 bg-[#ea580c]/20 border border-[#ea580c]/40 flex items-center justify-center flex-shrink-0 text-[8px] text-[#ea580c]">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center border border-[#ea580c]/40 bg-[#ea580c]/20 text-[8px] text-[#ea580c]">
             AI
           </div>
           <div className="bg-[#111] border border-white/10 px-2.5 py-2">
@@ -529,160 +529,158 @@ export function FeatureDemo() {
   const feature = features[active];
 
   return (
-    <section className="border-t-2 border-foreground">
-      {/* Section header */}
-      <div className="flex items-center justify-between px-4 lg:px-8 py-3 border-b-2 border-foreground">
-        <span className="text-[10px] font-mono tracking-[0.2em] text-muted-foreground">
-          {"// SECTION: FEATURE_DEMO"}
-        </span>
-        <span className="text-[10px] font-mono tracking-[0.2em] text-muted-foreground uppercase">
-          Content Studio
-        </span>
-      </div>
+    <section className="w-full px-6 py-20 lg:px-12">
+      <div className="mx-auto max-w-7xl border-t-2 border-foreground">
+        {/* Section header */}
+        <div className="flex items-center justify-between border-b-2 border-foreground px-4 py-3 lg:px-8">
+          <span className="text-[10px] font-mono tracking-[0.2em] text-muted-foreground">
+            {"// SECTION: FEATURE_DEMO"}
+          </span>
+          <span className="text-[10px] font-mono tracking-[0.2em] text-muted-foreground uppercase">
+            Content Studio
+          </span>
+        </div>
 
-      <div className="px-4 lg:px-8 pt-10 pb-4">
-        <motion.p
+        <div className="px-4 pt-10 pb-4 lg:px-8">
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: entrance }}
+            className="mb-3 text-[10px] font-mono tracking-[0.2em] uppercase text-[#ea580c]"
+          >
+            Formats
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1, duration: 0.6, ease: entrance }}
+            className="mb-8 text-3xl font-mono font-bold uppercase leading-[1.05] tracking-tight lg:text-5xl"
+          >
+            Everything you need
+            <br />
+            <span className="text-[#ea580c]">in one place.</span>
+          </motion.h2>
+        </div>
+
+        {/* Tab pills */}
+        <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, ease: entrance }}
-          className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#ea580c] mb-3"
+          transition={{ delay: 0.2, duration: 0.5, ease: entrance }}
+          className="flex items-center gap-0 overflow-x-auto border-b-2 border-foreground px-4 scrollbar-none lg:px-8"
         >
-          Formats
-        </motion.p>
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1, duration: 0.6, ease: entrance }}
-          className="text-3xl lg:text-5xl font-mono font-bold uppercase leading-[1.05] tracking-tight mb-8"
-        >
-          Everything you need
-          <br />
-          <span className="text-[#ea580c]">in one place.</span>
-        </motion.h2>
-      </div>
-
-      {/* Tab pills */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.2, duration: 0.5, ease: entrance }}
-        className="flex items-center gap-0 px-4 lg:px-8 overflow-x-auto scrollbar-none border-b-2 border-foreground"
-      >
-        {features.map((f, i) => (
-          <button
-            key={f.id}
-            onClick={() => setActive(i)}
-            className={`relative flex-shrink-0 px-4 py-3 text-[10px] font-mono tracking-[0.15em] uppercase transition-colors duration-150 border-r-2 border-foreground last:border-r-0 ${
-              active === i
-                ? "bg-foreground text-background"
-                : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
-            }`}
-          >
-            {f.label}
-            {active === i && (
-              <motion.span
-                layoutId="tab-indicator"
-                className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#ea580c]"
-                transition={{ duration: 0.2 }}
-              />
-            )}
-          </button>
-        ))}
-      </motion.div>
-
-      {/* Content area */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.6fr] border-b-2 border-foreground">
-        {/* Left: text */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={feature.id + "-text"}
-            initial={prefersReducedMotion ? false : { opacity: 0, x: -16 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={prefersReducedMotion ? {} : { opacity: 0, x: -8 }}
-            transition={{ duration: 0.3, ease: entrance }}
-            className="flex flex-col gap-6 p-6 lg:p-10 border-b-2 lg:border-b-0 lg:border-r-2 border-foreground"
-          >
-            <span className="text-[10px] font-mono tracking-[0.2em] text-[#ea580c] uppercase">
-              {feature.tag}
-            </span>
-
-            <h3 className="text-xl lg:text-2xl font-mono font-bold uppercase leading-tight whitespace-pre-line">
-              {feature.title}
-            </h3>
-
-            <p className="text-xs font-mono text-muted-foreground leading-relaxed">
-              {feature.description}
-            </p>
-
-            {/* Spec list */}
-            <ul className="flex flex-col gap-1.5">
-              {feature.specs.map((spec) => (
-                <li key={spec} className="flex items-center gap-2">
-                  <span className="h-1 w-1 bg-[#ea580c] flex-shrink-0" />
-                  <span className="text-[10px] font-mono tracking-[0.15em] text-muted-foreground uppercase">
-                    {spec}
-                  </span>
-                </li>
-              ))}
-            </ul>
-
-            <button className="group relative overflow-hidden self-start px-5 py-2.5 border-2 border-foreground text-[10px] font-mono tracking-[0.2em] uppercase transition-colors duration-300">
-              <span className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
-              <span className="relative z-10 group-hover:text-background transition-colors duration-300">
-                GET STARTED FREE
-              </span>
-            </button>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Right: wireframe mockup */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={feature.id + "-mockup"}
-            initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={prefersReducedMotion ? {} : { opacity: 0, scale: 0.96 }}
-            transition={{ duration: 0.35, ease: entrance }}
-            className="relative flex flex-col"
-          >
-            {/* Wireframe area */}
-            <div
-              className="relative flex-1 bg-[#0a0a0a] overflow-hidden"
-              style={{ minHeight: "340px" }}
+          {features.map((f, i) => (
+            <button
+              key={f.id}
+              onClick={() => setActive(i)}
+              className={`relative shrink-0 border-r-2 border-foreground px-4 py-3 text-[10px] font-mono tracking-[0.15em] uppercase transition-colors duration-150 last:border-r-0 ${
+                active === i
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
+              }`}
             >
-              {/* Corner brackets */}
-              <span className="absolute top-3 left-3 w-4 h-4 border-l-2 border-t-2 border-white/20 pointer-events-none z-10" />
-              <span className="absolute top-3 right-3 w-4 h-4 border-r-2 border-t-2 border-white/20 pointer-events-none z-10" />
-              <span className="absolute bottom-3 left-3 w-4 h-4 border-l-2 border-b-2 border-white/20 pointer-events-none z-10" />
-              <span className="absolute bottom-3 right-3 w-4 h-4 border-r-2 border-b-2 border-white/20 pointer-events-none z-10" />
+              {f.label}
+              {active === i && (
+                <motion.span
+                  layoutId="tab-indicator"
+                  className="absolute right-0 bottom-0 left-0 h-[2px] bg-[#ea580c]"
+                  transition={{ duration: 0.2 }}
+                />
+              )}
+            </button>
+          ))}
+        </motion.div>
 
-              <div className="p-5 h-full">
-                {(() => {
-                  const Mockup = WIREFRAMES[feature.id] ?? WireframeStudio;
-                  return <Mockup />;
-                })()}
-              </div>
-            </div>
-
-            {/* Bottom label strip */}
-            <div className="flex items-center justify-between px-4 py-2.5 border-t-2 border-foreground">
-              <span className="text-[10px] font-mono tracking-[0.15em] text-muted-foreground uppercase">
-                ATHENA / {feature.label}
+        {/* Content area */}
+        <div className="grid grid-cols-1 border-b-2 border-foreground lg:grid-cols-[1fr_1.6fr]">
+          {/* Left: text */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={feature.id + "-text"}
+              initial={prefersReducedMotion ? false : { opacity: 0, x: -16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={prefersReducedMotion ? {} : { opacity: 0, x: -8 }}
+              transition={{ duration: 0.3, ease: entrance }}
+              className="flex flex-col gap-6 border-foreground p-6 lg:border-r-2 lg:p-10"
+            >
+              <span className="text-[10px] font-mono tracking-[0.2em] text-[#ea580c] uppercase">
+                {feature.tag}
               </span>
-              <a
-                href="https://athena.cards"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] font-mono tracking-[0.15em] text-[#ea580c] uppercase hover:underline"
+
+              <h3 className="text-xl font-mono font-bold uppercase leading-tight whitespace-pre-line lg:text-2xl">
+                {feature.title}
+              </h3>
+
+              <p className="text-xs font-mono leading-relaxed text-muted-foreground">
+                {feature.description}
+              </p>
+
+              <ul className="flex flex-col gap-1.5">
+                {feature.specs.map((spec) => (
+                  <li key={spec} className="flex items-center gap-2">
+                    <span className="h-1 w-1 shrink-0 bg-[#ea580c]" />
+                    <span className="text-[10px] font-mono tracking-[0.15em] text-muted-foreground uppercase">
+                      {spec}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <button className="group relative self-start overflow-hidden border-2 border-foreground px-5 py-2.5 text-[10px] font-mono tracking-[0.2em] uppercase transition-colors duration-300">
+                <span className="absolute inset-0 translate-y-full bg-foreground transition-transform duration-300 ease-in-out group-hover:translate-y-0" />
+                <span className="relative z-10 transition-colors duration-300 group-hover:text-background">
+                  GET STARTED FREE
+                </span>
+              </button>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Right: wireframe mockup */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={feature.id + "-mockup"}
+              initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={prefersReducedMotion ? {} : { opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.35, ease: entrance }}
+              className="relative flex flex-col border-t-2 border-foreground lg:border-t-0"
+            >
+              <div
+                className="relative flex-1 overflow-hidden bg-[#0a0a0a]"
+                style={{ minHeight: "340px" }}
               >
-                → TRY LIVE DEMO
-              </a>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+                <span className="pointer-events-none absolute top-3 left-3 z-10 h-4 w-4 border-t-2 border-l-2 border-white/20" />
+                <span className="pointer-events-none absolute top-3 right-3 z-10 h-4 w-4 border-t-2 border-r-2 border-white/20" />
+                <span className="pointer-events-none absolute bottom-3 left-3 z-10 h-4 w-4 border-b-2 border-l-2 border-white/20" />
+                <span className="pointer-events-none absolute right-3 bottom-3 z-10 h-4 w-4 border-r-2 border-b-2 border-white/20" />
+
+                <div className="h-full p-5">
+                  {(() => {
+                    const Mockup = WIREFRAMES[feature.id] ?? WireframeStudio;
+                    return <Mockup />;
+                  })()}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between border-t-2 border-foreground px-4 py-2.5">
+                <span className="text-[10px] font-mono tracking-[0.15em] text-muted-foreground uppercase">
+                  ATHENA / {feature.label}
+                </span>
+                <a
+                  href="https://athena.cards"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-mono tracking-[0.15em] text-[#ea580c] uppercase hover:underline"
+                >
+                  → TRY LIVE DEMO
+                </a>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </section>
   );

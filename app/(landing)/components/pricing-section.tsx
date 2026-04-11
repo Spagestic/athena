@@ -297,7 +297,7 @@ function PricingCard({ tier, index }: { tier: Tier; index: number }) {
           <span className="flex items-center justify-center w-9 h-9 bg-[#ea580c] relative z-10">
             <ArrowRight size={14} strokeWidth={2} className="text-background" />
           </span>
-          <span className="absolute inset-0 left-9 bg-[#E97316] translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+          <span className="absolute inset-0 left-9 bg-[#E97316] -translate-x-full transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0" />
           <span className="relative z-10 flex-1 py-2.5">{tier.cta}</span>
         </motion.button>
       </div>
@@ -309,63 +309,63 @@ function PricingCard({ tier, index }: { tier: Tier; index: number }) {
 export function PricingSection() {
   return (
     <section className="w-full px-6 py-20 lg:px-12">
-      {/* Section label */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.5, ease: entrance }}
-        className="flex items-center gap-4 mb-8"
-      >
-        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
-          {"// SECTION: PRICING_TIERS"}
-        </span>
-        <div className="flex-1 border-t border-border" />
-        <BlinkDot />
-        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
-          006
-        </span>
-      </motion.div>
+      <div className="mx-auto max-w-7xl">
+        {/* Section label */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5, ease: entrance }}
+          className="mb-8 flex items-center gap-4"
+        >
+          <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
+            {"// SECTION: PRICING_TIERS"}
+          </span>
+          <div className="flex-1 border-t border-border" />
+          <BlinkDot />
+          <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
+            006
+          </span>
+        </motion.div>
 
-      {/* Section header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: 0.6, ease: entrance }}
-        className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12"
-      >
-        <div className="flex flex-col gap-3">
-          <h2 className="text-2xl lg:text-3xl font-mono font-bold tracking-tight uppercase text-foreground text-balance">
-            Choose your plan
-          </h2>
-          <p className="text-xs lg:text-sm font-mono text-muted-foreground leading-relaxed max-w-md">
-            No credit card required. Free forever plan available.
-          </p>
+        {/* Section header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6, ease: entrance }}
+          className="mb-12 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"
+        >
+          <div className="flex flex-col gap-3">
+            <h2 className="text-2xl font-mono font-bold tracking-tight uppercase text-foreground text-balance lg:text-3xl">
+              Choose your plan
+            </h2>
+            <p className="max-w-md text-xs font-mono leading-relaxed text-muted-foreground lg:text-sm">
+              No credit card required. Free forever plan available.
+            </p>
+          </div>
+          <StatusLine />
+        </motion.div>
+
+        <div className="grid grid-cols-1 gap-0 md:grid-cols-3">
+          {TIERS.map((tier, i) => (
+            <PricingCard key={tier.id} tier={tier} index={i} />
+          ))}
         </div>
-        <StatusLine />
-      </motion.div>
 
-      {/* Pricing grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
-        {TIERS.map((tier, i) => (
-          <PricingCard key={tier.id} tier={tier} index={i} />
-        ))}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.5, duration: 0.5, ease: entrance }}
+          className="mt-6 flex items-center gap-3"
+        >
+          <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
+            {"* No credit card required. Free forever plan. Cancel anytime."}
+          </span>
+          <div className="flex-1 border-t border-border" />
+        </motion.div>
       </div>
-
-      {/* Bottom note */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.5, duration: 0.5, ease: entrance }}
-        className="flex items-center gap-3 mt-6"
-      >
-        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-mono">
-          {"* No credit card required. Free forever plan. Cancel anytime."}
-        </span>
-        <div className="flex-1 border-t border-border" />
-      </motion.div>
     </section>
   );
 }
