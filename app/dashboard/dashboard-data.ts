@@ -76,7 +76,7 @@ export const dashboardModules: DashboardModule[] = [
     title: "Introduction to Computer Science",
     noteCount: 18,
     pendingTasks: 4,
-    professor: "Prof. Gibson Lam",
+    professor: "Gibson Lam",
   },
   {
     code: "MATH1014",

@@ -2,7 +2,7 @@
 
 import { useTheme } from "next-themes";
 import { Flame, LogOut, Moon, Search, Settings, Sun } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 
 import { userInitial, streakCount } from "../dashboard-data";
 
@@ -12,17 +12,31 @@ type DashboardHeaderProps = {
   onSearchQueryChange: (value: string) => void;
 };
 
+function subscribeToMount() {
+  return () => undefined;
+}
+
 export function DashboardHeader({
   isScrolled,
   searchQuery,
   onSearchQueryChange,
 }: DashboardHeaderProps) {
   const { resolvedTheme, setTheme } = useTheme();
-  const isDarkMode = useMemo(() => resolvedTheme === "dark", [resolvedTheme]);
+  const isMounted = useSyncExternalStore(
+    subscribeToMount,
+    () => true,
+    () => false,
+  );
+  const isDarkMode = useMemo(
+    () => isMounted && resolvedTheme === "dark",
+    [isMounted, resolvedTheme],
+  );
 
   return (
     <header
-      className={`sticky top-0 z-20 px-4 pt-4 transition-all duration-500 md:px-8 bg-background`}
+      className={`sticky top-0 z-20 px-4 pt-4 transition-all duration-500 md:px-8 ${
+        isScrolled ? "bg-background/95 backdrop-blur-sm" : "bg-transparent"
+      }`}
     >
       <div
         className={`flex flex-col gap-4 pb-4 transition-all duration-500 md:flex-row md:items-center md:justify-between ${
@@ -52,6 +66,24 @@ export function DashboardHeader({
               <p className="text-lg font-black leading-none">{streakCount}</p>
             </div>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setTheme(isDarkMode ? "light" : "dark")}
+            className="flex h-14 items-center gap-2 border-2 border-foreground bg-background px-4 shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5"
+            aria-label={
+              isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+            }
+          >
+            {isDarkMode ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+            <span className="text-xs font-mono uppercase tracking-[0.14em]">
+              {isDarkMode ? "Light" : "Dark"}
+            </span>
+          </button>
 
           <details className="relative">
             <summary className="flex h-14 w-14 cursor-pointer list-none items-center justify-center border-2 border-foreground bg-background text-lg font-black uppercase shadow-[4px_4px_0_0_rgba(0,0,0,1)] [&::-webkit-details-marker]:hidden">
