@@ -56,7 +56,7 @@ export function ModuleWorkspace({ notes, tasks }: ModuleWorkspaceProps) {
 
       <div className="overflow-x-auto border-2 border-foreground bg-card shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
         {activeTab === "notes" ? (
-          <table className="w-full min-w-[760px] table-fixed border-collapse">
+          <table className="w-full min-w-190 table-fixed border-collapse">
             <thead>
               <tr className="bg-background">
                 <th className="w-[42%] border-b-2 border-r-2 border-foreground px-3 py-3 text-left text-xs font-bold uppercase tracking-[0.16em]">
@@ -132,7 +132,7 @@ export function ModuleWorkspace({ notes, tasks }: ModuleWorkspaceProps) {
             </tbody>
           </table>
         ) : (
-          <table className="w-full min-w-[720px] border-collapse">
+          <table className="w-full min-w-180 border-collapse">
             <thead>
               <tr className="bg-background">
                 <th className="w-16 border-b-2 border-r-2 border-foreground px-3 py-3 text-left text-xs font-bold uppercase tracking-[0.16em]">
@@ -165,7 +165,7 @@ export function ModuleWorkspace({ notes, tasks }: ModuleWorkspaceProps) {
                     {task.dueLabel}
                   </td>
                   <td className="border-r-2 border-t-2 border-foreground px-3 py-3 text-sm font-mono uppercase tracking-[0.12em]">
-                    {task.effortScore}
+                    {task.signalScore}
                   </td>
                   <td className="border-t-2 border-foreground px-3 py-3">
                     <div className="flex items-center gap-3">

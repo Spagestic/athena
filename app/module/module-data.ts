@@ -83,12 +83,7 @@ const moduleExtras: Record<
   string,
   Omit<
     ModulePageData,
-    | "code"
-    | "title"
-    | "professor"
-    | "noteCount"
-    | "pendingTasks"
-    | "tasks"
+    "code" | "title" | "professor" | "noteCount" | "pendingTasks" | "tasks"
   >
 > = {
   COMP1021: {
@@ -263,6 +258,7 @@ export function getModulePageData(moduleCode: string): ModulePageData | null {
   return {
     ...courseModule,
     ...extras,
+    professor: courseModule.subtitle,
     tasks: deadlineTasks.filter((task) => task.moduleCode === normalizedCode),
   };
 }

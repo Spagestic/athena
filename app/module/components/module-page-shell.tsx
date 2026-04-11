@@ -49,7 +49,14 @@ export function ModulePageShell({ module }: ModulePageShellProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground dot-grid-bg">
-      <ModuleHeader isScrolled={isScrolled} moduleCode={module.code} />
+      <ModuleHeader
+        isScrolled={isScrolled}
+        notifications={[]}
+        searchQuery=""
+        streakCount={0}
+        user={null}
+        onSearchQueryChange={() => undefined}
+      />
 
       <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 md:px-8 md:py-10">
         <section className="space-y-6 border-2 border-foreground bg-card p-6 shadow-[4px_4px_0_0_rgba(0,0,0,1)] md:p-8">
@@ -79,7 +86,9 @@ export function ModulePageShell({ module }: ModulePageShellProps) {
                 <div className="space-y-3">
                   <textarea
                     value={draftDescription}
-                    onChange={(event) => setDraftDescription(event.target.value)}
+                    onChange={(event) =>
+                      setDraftDescription(event.target.value)
+                    }
                     rows={3}
                     className="w-full border-2 border-foreground bg-background px-4 py-3 text-base font-medium text-foreground shadow-[4px_4px_0_0_rgba(0,0,0,1)] focus:outline-none md:text-lg"
                   />
