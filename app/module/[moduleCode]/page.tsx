@@ -1,19 +1,21 @@
 "use client";
 
 import { useQuery } from "convex/react";
+import { use } from "react";
 
 import { api } from "@/convex/_generated/api";
 import { ModulePageShell } from "../components/module-page-shell";
 
 type ModulePageProps = {
-  params: {
+  params: Promise<{
     moduleCode: string;
-  };
+  }>;
 };
 
 export default function ModulePage({ params }: ModulePageProps) {
+  const { moduleCode } = use(params);
   const moduleData = useQuery(api.modules.getModuleWorkspace, {
-    moduleCode: params.moduleCode,
+    moduleCode,
   });
 
   if (moduleData === undefined) {

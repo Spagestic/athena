@@ -1,8 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Loader2, TriangleAlert } from "lucide-react";
+import { Download, Loader2, TriangleAlert, Upload } from "lucide-react";
 
+import FileUpload from "@/components/file-upload";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   HoverCard,
   HoverCardContent,
@@ -14,6 +23,13 @@ import { type ModuleNoteRow, type ModuleTaskRow } from "../module-data";
 type ModuleWorkspaceProps = {
   notes: ModuleNoteRow[];
   tasks: ModuleTaskRow[];
+  isUploading: boolean;
+  uploadError: string | null;
+  onUploadFile: (file: File) => Promise<void>;
+  validateUploadFile: (file: File) => {
+    code: string;
+    message: string;
+  } | null;
 };
 
 type WorkspaceTab = "notes" | "tasks";
@@ -49,35 +65,101 @@ function formatLastUpdated(timestamp: number) {
   return new Date(timestamp).toLocaleDateString();
 }
 
-export function ModuleWorkspace({ notes, tasks }: ModuleWorkspaceProps) {
+export function ModuleWorkspace({
+  notes,
+  tasks,
+  isUploading,
+  uploadError,
+  onUploadFile,
+  validateUploadFile,
+}: ModuleWorkspaceProps) {
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("notes");
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
   return (
     <section className="space-y-4 pb-10">
-      <div className="flex items-center gap-2">
-        <button
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab("notes")}
+            className={`border-2 border-foreground px-4 py-2 text-sm font-mono uppercase tracking-[0.14em] shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5 ${
+              activeTab === "notes"
+                ? "bg-foreground text-background"
+                : "bg-background"
+            }`}
+          >
+            Notes
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("tasks")}
+            className={`border-2 border-foreground px-4 py-2 text-sm font-mono uppercase tracking-[0.14em] shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5 ${
+              activeTab === "tasks"
+                ? "bg-foreground text-background"
+                : "bg-background"
+            }`}
+          >
+            Tasks
+          </button>
+        </div>
+        <Button
           type="button"
-          onClick={() => setActiveTab("notes")}
-          className={`border-2 border-foreground px-4 py-2 text-sm font-mono uppercase tracking-[0.14em] shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5 ${
-            activeTab === "notes"
-              ? "bg-foreground text-background"
-              : "bg-background"
-          }`}
+          onClick={() => setIsUploadDialogOpen(true)}
+          className="border-2 border-foreground bg-background text-foreground shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
         >
-          Notes
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("tasks")}
-          className={`border-2 border-foreground px-4 py-2 text-sm font-mono uppercase tracking-[0.14em] shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5 ${
-            activeTab === "tasks"
-              ? "bg-foreground text-background"
-              : "bg-background"
-          }`}
-        >
-          Tasks
-        </button>
+          {isUploading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Upload className="h-4 w-4" />
+          )}
+          Upload
+        </Button>
       </div>
+
+      <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+        <DialogContent className="max-w-2xl border-2 border-foreground bg-background p-0 shadow-[8px_8px_0_0_rgba(0,0,0,1)]">
+          <DialogHeader className="border-b-2 border-foreground px-6 py-5">
+            <DialogTitle className="text-xl font-black uppercase tracking-[0.12em]">
+              Upload course materials
+            </DialogTitle>
+            <DialogDescription className="font-mono uppercase tracking-[0.08em]">
+              Add a PDF or document and Athena will save it to Convex storage, then run OCR automatically.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 px-6 py-5">
+            <FileUpload
+              acceptedFileTypes={[
+                "application/pdf",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.ms-powerpoint",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "text/plain",
+                "text/markdown",
+              ]}
+              maxFileSize={25 * 1024 * 1024}
+              uploadDelay={600}
+              validateFile={validateUploadFile}
+              onUploadSuccess={(file) => {
+                void onUploadFile(file).then(() => {
+                  setIsUploadDialogOpen(false);
+                });
+              }}
+              onUploadError={() => undefined}
+              className="max-w-none"
+            />
+            <p className="text-xs font-mono uppercase tracking-[0.12em] text-muted-foreground">
+              Supported: PDF, DOC, DOCX, PPT, PPTX, TXT, MD
+            </p>
+            {uploadError ? (
+              <p className="border-2 border-red-500 bg-red-500/10 px-3 py-2 text-sm font-medium text-red-700">
+                {uploadError}
+              </p>
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="overflow-x-auto border-2 border-foreground bg-card shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
         {activeTab === "notes" ? (
