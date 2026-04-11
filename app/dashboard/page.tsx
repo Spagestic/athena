@@ -59,6 +59,7 @@ export default function DashboardPage() {
     }
 
     return tasks.slice(0, 2).map((task) => ({
+      id: task.id,
       detail: `${task.moduleCode} · ${task.dueLabel}`,
       title: task.title,
     }));

@@ -5,7 +5,6 @@ import { useMutation } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import {
   Bell,
-  Flame,
   LogOut,
   Search,
   Settings,
@@ -37,6 +36,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { StreakInsightsTrigger } from "@/components/streak-insights-trigger";
 
 type DashboardHeaderProps = {
   isScrolled: boolean;
@@ -117,15 +117,7 @@ export function ModuleHeader({
           />
         </label>
         <div className="flex items-center justify-end gap-3">
-          <div className="flex h-14 items-center gap-2 border-2 border-orange-500 bg-background px-4 shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
-            <Flame className="h-5 w-5 text-orange-500" />
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                Streak
-              </p>
-              <p className="text-lg font-black leading-none">{streakCount}</p>
-            </div>
-          </div>
+          <StreakInsightsTrigger streakCount={streakCount} />
 
           <DropdownMenu>
             <DropdownMenuTrigger
@@ -142,7 +134,7 @@ export function ModuleHeader({
                 {safeNotifications.length > 0 ? (
                   safeNotifications.map((notification, index) => (
                     <div
-                      key={notification.title}
+                      key={notification.id}
                       className="flex flex-col px-3"
                     >
                       <div className="flex items-start">

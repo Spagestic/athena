@@ -3,6 +3,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { query, type QueryCtx } from "./_generated/server";
 import { getCourseLabel } from "./courseLabels";
+import { buildTaskId } from "./taskIds";
 
 export const getDashboard = query({
   args: {},
@@ -159,7 +160,7 @@ function buildFolderTasks(
 
   if (notes.length === 0) {
     tasks.push({
-      id: `${folder._id}-upload-first-note`,
+      id: buildTaskId(folder._id, code, "upload-first-note"),
       title: "Upload your first note",
       moduleCode: code,
       dueLabel: "No materials added yet",
@@ -172,7 +173,7 @@ function buildFolderTasks(
   for (const note of notes) {
     if (note.processingStatus === "failed") {
       tasks.push({
-        id: `${note._id}-retry-ingestion`,
+        id: buildTaskId(folder._id, note._id, code, "retry-ingestion"),
         title: `Retry ${note.title}`,
         moduleCode: code,
         dueLabel: "Import needs attention",
@@ -184,7 +185,7 @@ function buildFolderTasks(
 
     if (note.processingStatus === "pending" || note.processingStatus === "processing") {
       tasks.push({
-        id: `${note._id}-processing`,
+        id: buildTaskId(folder._id, note._id, code, "processing"),
         title: `Review ${note.title}`,
         moduleCode: code,
         dueLabel: "Material still processing",
@@ -197,7 +198,7 @@ function buildFolderTasks(
 
   if (quizzes.length === 0 && notes.some((note) => note.processingStatus === "ready")) {
     tasks.push({
-      id: `${folder._id}-generate-quiz`,
+      id: buildTaskId(folder._id, code, "generate-quiz"),
       title: "Generate your first quiz",
       moduleCode: code,
       dueLabel: "Ready notes are waiting",
@@ -211,7 +212,7 @@ function buildFolderTasks(
     const latestAttempt = latestAttemptsByQuiz.get(quiz._id);
     if (!latestAttempt) {
       tasks.push({
-        id: `${quiz._id}-start-quiz`,
+        id: buildTaskId(folder._id, quiz._id, code, "start-quiz"),
         title: quiz.title,
         moduleCode: code,
         dueLabel: "No quiz attempt yet",
@@ -224,7 +225,7 @@ function buildFolderTasks(
 
     if (latestAttempt.status === "in_progress" || latestAttempt.status === "abandoned") {
       tasks.push({
-        id: `${quiz._id}-resume-quiz`,
+        id: buildTaskId(folder._id, quiz._id, code, "resume-quiz"),
         title: `Resume ${quiz.title}`,
         moduleCode: code,
         dueLabel: "Previous attempt unfinished",
