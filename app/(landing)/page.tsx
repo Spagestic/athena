@@ -13,8 +13,10 @@ export default function Page() {
       <Navbar />
       <main>
         <HeroSection />
-        <section id="features">
+        <section>
           <FeatureGrid />
+        </section>
+        <section id="features">
           <FeatureDemo />
         </section>
         <section id="about">

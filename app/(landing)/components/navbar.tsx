@@ -6,6 +6,12 @@ import { motion } from "framer-motion";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Navbar() {
+  const links = [
+    { label: "Features", href: "#features" },
+    { label: "About", href: "#about" },
+    { label: "Pricing", href: "#pricing" },
+  ];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -38,24 +44,22 @@ export function Navbar() {
 
           {/* Center nav links */}
           <div className="hidden md:flex items-center gap-8">
-            {["Platform", "Enterprise", "Resources", "Company"].map(
-              (link, i) => (
-                <motion.a
-                  key={link}
-                  href="#"
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    delay: 0.3 + i * 0.06,
-                    duration: 0.4,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  className="text-xs font-mono tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
-                >
-                  {link}
-                </motion.a>
-              ),
-            )}
+            {links.map((link, i) => (
+              <motion.a
+                key={link.label}
+                href={link.href}
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: 0.3 + i * 0.06,
+                  duration: 0.4,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="text-xs font-mono tracking-widest uppercase text-muted-foreground transition-colors duration-200 hover:text-foreground"
+              >
+                {link.label}
+              </motion.a>
+            ))}
           </div>
 
           {/* Right side: Login + CTA */}
