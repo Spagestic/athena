@@ -4,11 +4,16 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { Flame, LogOut, Search, Settings } from "lucide-react";
+import { Bell, Flame, LogOut, Search, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { userInitial, streakCount } from "../dashboard-data";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type DashboardHeaderProps = {
   isScrolled: boolean;
@@ -24,6 +29,16 @@ export function DashboardHeader({
   const router = useRouter();
   const { signOut } = useAuthActions();
   const user = useQuery(api.users.getCurrentUser);
+  const notifications = [
+    {
+      title: "Lab checkpoint reminder",
+      detail: "COMP1021 is due in 4 hours.",
+    },
+    {
+      title: "New module note shared",
+      detail: "Someone added revision notes for MATH1014.",
+    },
+  ];
 
   const handleSignOut = () => {
     void signOut().then(() => {
@@ -75,20 +90,51 @@ export function DashboardHeader({
             </div>
           </div>
 
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="relative flex h-14 w-14 items-center justify-center border-2 border-foreground bg-background text-lg font-black uppercase shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition-colors hover:bg-accent"
+              aria-label="Open notifications"
+            >
+              <Bell className="h-5 w-5" />
+              <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-orange-500 ring-2 ring-background" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80 p-0">
+              <div className="flex flex-col px-2 py-4">
+                {notifications.map((notification, index) => (
+                  <div key={notification.title} className="flex flex-col px-3">
+                    <div className="flex items-start">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">
+                          {notification.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground normal-case tracking-normal">
+                          {notification.detail}
+                        </p>
+                      </div>
+                    </div>
+                    {index < notifications.length - 1 ? (
+                      <DropdownMenuSeparator className="my-3 w-full" />
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <details className="relative">
-            <summary className="flex h-14 w-14 cursor-pointer list-none items-center justify-center border-2 border-foreground bg-background text-lg font-black uppercase shadow-[4px_4px_0_0_rgba(0,0,0,1)] [&::-webkit-details-marker]:hidden">
+            <summary className="flex h-14 w-14 cursor-pointer list-none items-stretch justify-stretch overflow-hidden border-2 border-foreground bg-background text-lg font-black uppercase shadow-[4px_4px_0_0_rgba(0,0,0,1)] [&::-webkit-details-marker]:hidden">
               {user?.image ? (
-                <Avatar className="h-14 w-14 rounded-none border-0">
-                  <AvatarImage
-                    alt={user?.name ?? "User profile"}
-                    src={user.image}
-                  />
-                  <AvatarFallback className="rounded-none text-lg font-black uppercase">
-                    {user?.name?.charAt(0) ?? userInitial}
-                  </AvatarFallback>
-                </Avatar>
+                <Image
+                  alt={user?.name ?? "User profile"}
+                  className="h-full w-full object-cover"
+                  height={56}
+                  src={user.image}
+                  width={56}
+                />
               ) : (
-                (user?.name?.charAt(0) ?? userInitial)
+                <span className="flex h-full w-full items-center justify-center">
+                  {user?.name?.charAt(0) ?? userInitial}
+                </span>
               )}
             </summary>
             <div className="absolute right-0 mt-3 flex min-w-44 flex-col border-2 border-foreground bg-background shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
