@@ -11,6 +11,7 @@ import { ControlBar } from "./components/ControlBar";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type SpeechRecognitionCompat = any;
+type SpeechRecognitionEventCompat = any;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 /* ═══════════════════════════════════════════════════════════
@@ -377,7 +378,7 @@ export default function AnalysisDashboard() {
         sr.continuous = true;
         sr.interimResults = false;
         sr.lang = "en-US";
-        sr.onresult = (ev: SpeechRecognitionEvent) => {
+        sr.onresult = (ev: SpeechRecognitionEventCompat) => {
             for (let i = ev.resultIndex; i < ev.results.length; i++) {
                 if (ev.results[i].isFinal) {
                     handleTranscript(ev.results[i][0].transcript);
