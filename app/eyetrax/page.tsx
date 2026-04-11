@@ -402,7 +402,7 @@ export default function EyeTraxStudy() {
       <header className="border-b-2 border-foreground px-6 py-3 flex items-center justify-between bg-background z-50 sticky top-0">
         <div className="flex items-center gap-4">
           <span className="text-[11px] tracking-[0.3em] uppercase font-bold text-primary">
-            HKUSTEAM
+            Athena
           </span>
           <span className="text-muted-foreground text-[11px]">/</span>
           <span className="text-[11px] tracking-widest uppercase">
