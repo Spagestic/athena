@@ -49,6 +49,7 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
   const createFolder = useMutation(api.folders.createFolder);
   const deleteFolder = useMutation(api.folders.deleteFolder);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [courseCode, setCourseCode] = useState("");
   const [courseName, setCourseName] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,6 +59,7 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const resetForm = () => {
+    setCourseCode("");
     setCourseName("");
     setDescription("");
     setFormError(null);
@@ -74,7 +76,18 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
   const handleCreateCourse = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const trimmedCode = courseCode.trim().toUpperCase();
     const trimmedName = courseName.trim();
+    if (!trimmedCode) {
+      setFormError("Course code is required.");
+      return;
+    }
+
+    if (trimmedCode.length > 8) {
+      setFormError("Course code must be 8 characters or fewer.");
+      return;
+    }
+
     if (trimmedName.length < 3) {
       setFormError("Course name must be at least 3 characters.");
       return;
@@ -85,6 +98,7 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
 
     try {
       await createFolder({
+        code: trimmedCode,
         description: description.trim() || undefined,
         name: trimmedName,
       });
@@ -165,6 +179,28 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
               <div className="space-y-5 px-6 py-5">
                 <div className="space-y-2">
                   <Label
+                    htmlFor="course-code"
+                    className="font-mono uppercase tracking-[0.12em]"
+                  >
+                    Course Code
+                  </Label>
+                  <Input
+                    id="course-code"
+                    value={courseCode}
+                    onChange={(event) =>
+                      setCourseCode(
+                        event.target.value.toUpperCase().replace(/\s+/g, ""),
+                      )
+                    }
+                    placeholder="COMP1021"
+                    className="h-11 border-2 border-foreground bg-background shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
+                    disabled={isSubmitting}
+                    maxLength={8}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label
                     htmlFor="course-name"
                     className="font-mono uppercase tracking-[0.12em]"
                   >
@@ -174,7 +210,7 @@ export function ModuleCards({ modules }: ModuleCardsProps) {
                     id="course-name"
                     value={courseName}
                     onChange={(event) => setCourseName(event.target.value)}
-                    placeholder="COMP1021 - Introduction to Computer Science"
+                    placeholder="Introduction to Computer Science"
                     className="h-11 border-2 border-foreground bg-background shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
                     disabled={isSubmitting}
                   />

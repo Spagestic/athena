@@ -2,14 +2,17 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
 import { mutation, type MutationCtx } from "./_generated/server";
+import { getCourseLabel, normalizeCourseCode } from "./courseLabels";
 
 export const createFolder = mutation({
   args: {
+    code: v.string(),
     description: v.optional(v.string()),
     name: v.string(),
   },
   handler: async (ctx, args) => {
     const userId = await requireAuthenticatedUser(ctx);
+    const code = normalizeCourseCode(args.code);
     const name = args.name.trim();
     const description = args.description?.trim();
 
@@ -17,8 +20,42 @@ export const createFolder = mutation({
       throw new Error("Course name must be at least 3 characters.");
     }
 
+    if (!code) {
+      throw new Error("Course code is required.");
+    }
+
+    if (code.length > 8) {
+      throw new Error("Course code must be 8 characters or fewer.");
+    }
+
+    if (!/^[A-Z0-9-]+$/.test(code)) {
+      throw new Error("Course code can only contain letters, numbers, and hyphens.");
+    }
+
+    const [ownedFolders, memberships] = await Promise.all([
+      ctx.db
+        .query("folders")
+        .withIndex("by_owner", (q) => q.eq("ownerId", userId))
+        .collect(),
+      ctx.db
+        .query("folderMembers")
+        .withIndex("by_user", (q) => q.eq("userId", userId))
+        .collect(),
+    ]);
+    const memberFolders = await Promise.all(
+      memberships.map((membership) => ctx.db.get(membership.folderId)),
+    );
+    const hasConflict = [...ownedFolders, ...memberFolders.filter((folder) => folder !== null)].some(
+      (folder) => getCourseLabel(folder).code === code,
+    );
+
+    if (hasConflict) {
+      throw new Error("You already have a course with that code.");
+    }
+
     const now = Date.now();
     const folderId = await ctx.db.insert("folders", {
+      code,
       createdAt: now,
       description: description ? description : undefined,
       name,

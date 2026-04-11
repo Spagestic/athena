@@ -10,6 +10,7 @@
 
 import type * as CustomPassword from "../CustomPassword.js";
 import type * as auth from "../auth.js";
+import type * as courseLabels from "../courseLabels.js";
 import type * as dashboard from "../dashboard.js";
 import type * as demo from "../demo.js";
 import type * as exa from "../exa.js";
@@ -35,6 +36,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   CustomPassword: typeof CustomPassword;
   auth: typeof auth;
+  courseLabels: typeof courseLabels;
   dashboard: typeof dashboard;
   demo: typeof demo;
   exa: typeof exa;

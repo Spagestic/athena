@@ -5,6 +5,7 @@ import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { action, internalMutation, mutation, query } from "./_generated/server";
 import type { ActionCtx, MutationCtx, QueryCtx } from "./_generated/server";
+import { getCourseLabel, normalizeCourseCode } from "./courseLabels";
 import { runOcrRequest } from "./ocr";
 
 export const getModuleWorkspace = query({
@@ -49,7 +50,7 @@ export const getModuleWorkspace = query({
         .collect(),
     ]);
 
-    const parsedFolder = parseCourseLabel(folder.name);
+    const parsedFolder = getCourseLabel(folder);
     const noteRows = await buildNoteRows(ctx, notes, quizzes);
     const tasks = buildFolderTasks(folder, notes, quizzes, attempts);
 
@@ -287,31 +288,15 @@ async function getAccessibleFolderByCode(
     memberships.map((membership) => ctx.db.get(membership.folderId)),
   );
 
-  const normalizedCode = moduleCode.toUpperCase();
+  const normalizedCode = normalizeCourseCode(moduleCode);
+  if (!normalizedCode) {
+    return null;
+  }
   return (
     [...ownedFolders, ...memberFolders.filter((folder) => folder !== null)].find(
-      (folder) => parseCourseLabel(folder.name).code === normalizedCode,
+      (folder) => getCourseLabel(folder).code === normalizedCode,
     ) ?? null
   );
-}
-
-function parseCourseLabel(name: string) {
-  const [maybeCode, ...rest] = name.split(/\s[-–—]\s/);
-  if (rest.length > 0 && looksLikeCourseCode(maybeCode)) {
-    return {
-      code: maybeCode.toUpperCase(),
-      title: rest.join(" - "),
-    };
-  }
-
-  return {
-    code: name.slice(0, 6).toUpperCase(),
-    title: name,
-  };
-}
-
-function looksLikeCourseCode(value: string) {
-  return /^[A-Za-z]{2,}\d{1,}[A-Za-z0-9-]*$/.test(value.replace(/\s+/g, ""));
 }
 
 function initialsForName(name: string | null | undefined) {
@@ -367,7 +352,7 @@ function buildFolderTasks(
     }
   }
 
-  const code = parseCourseLabel(folder.name).code;
+  const code = getCourseLabel(folder).code;
   const tasks: Array<{
     id: string;
     title: string;

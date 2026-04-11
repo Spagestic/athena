@@ -38,11 +38,14 @@ export default defineSchema({
   /** Course workspace (folder) per README; owner creates and uploads materials. */
   folders: defineTable({
     ownerId: v.id("users"),
+    code: v.optional(v.string()),
     name: v.string(),
     description: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }).index("by_owner", ["ownerId"]),
+  })
+    .index("by_owner", ["ownerId"])
+    .index("by_code", ["code"]),
 
   /** Shared access for per-folder leaderboards and collaborative workspaces. */
   folderMembers: defineTable({
