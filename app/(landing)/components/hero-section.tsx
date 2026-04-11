@@ -1,161 +1,206 @@
-"use client"
+"use client";
 
-import { useEffect, useState, useRef } from "react"
-import { ArrowRight } from "lucide-react"
-import { DashboardPreview } from "@/app/(landing)/components/dashboard-preview"
-import { motion } from "framer-motion"
+import { useEffect, useState, useRef } from "react";
+import { ArrowRight } from "lucide-react";
+import { DashboardPreview } from "@/app/(landing)/components/dashboard-preview";
+import { motion } from "framer-motion";
 
-const ease = [0.22, 1, 0.36, 1] as const
+const ease = [0.22, 1, 0.36, 1] as const;
 
 export function HeroSection() {
-  const [displayedText1, setDisplayedText1] = useState("")
-  const [displayedText2, setDisplayedText2] = useState("")
-  const [isTypingDone, setIsTypingDone] = useState(false)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const text1 = "Learn anything."
-  const text2 = "Remember everything."
+  const [displayedText1, setDisplayedText1] = useState("");
+  const [displayedText2, setDisplayedText2] = useState("");
+  const [isTypingDone, setIsTypingDone] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const text1 = "Learn anything.";
+  const text2 = "Remember everything.";
 
   // Typewriter effect
   useEffect(() => {
-    let currentIndex = 0
-    const fullText = text1 + "|" + text2
+    let currentIndex = 0;
+    const fullText = text1 + "|" + text2;
 
     const typeInterval = setInterval(() => {
       if (currentIndex <= fullText.length) {
-        const currentChar = fullText.substring(0, currentIndex)
-        const parts = currentChar.split("|")
-        setDisplayedText1(parts[0] || "")
-        setDisplayedText2(parts[1] || "")
-        currentIndex++
+        const currentChar = fullText.substring(0, currentIndex);
+        const parts = currentChar.split("|");
+        setDisplayedText1(parts[0] || "");
+        setDisplayedText2(parts[1] || "");
+        currentIndex++;
       } else {
-        clearInterval(typeInterval)
-        setIsTypingDone(true)
+        clearInterval(typeInterval);
+        setIsTypingDone(true);
       }
-    }, 80)
+    }, 80);
 
-    return () => clearInterval(typeInterval)
-  }, [])
+    return () => clearInterval(typeInterval);
+  }, []);
 
   // Canvas animated dots on grid
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
     const resizeCanvas = () => {
-      canvas.width = canvas.offsetWidth * window.devicePixelRatio
-      canvas.height = canvas.offsetHeight * window.devicePixelRatio
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
-    }
-    resizeCanvas()
-    window.addEventListener("resize", resizeCanvas)
+      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    };
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
 
     interface GridDot {
-      x: number; y: number
-      direction: "horizontal" | "vertical"
-      speed: number; size: number; opacity: number
-      color: string; targetX: number; targetY: number
-      trail: { x: number; y: number }[]
+      x: number;
+      y: number;
+      direction: "horizontal" | "vertical";
+      speed: number;
+      size: number;
+      opacity: number;
+      color: string;
+      targetX: number;
+      targetY: number;
+      trail: { x: number; y: number }[];
     }
 
-    const gridSize = 64
-    const dotCount = 20
-    const snapToGrid = (value: number) => Math.round(value / gridSize) * gridSize
+    const gridSize = 64;
+    const dotCount = 20;
+    const snapToGrid = (value: number) =>
+      Math.round(value / gridSize) * gridSize;
 
-    const gridDots: GridDot[] = []
+    const gridDots: GridDot[] = [];
     for (let i = 0; i < dotCount; i++) {
-      const isHorizontal = Math.random() > 0.5
-      const x = snapToGrid(Math.random() * canvas.offsetWidth)
-      const y = snapToGrid(Math.random() * canvas.offsetHeight)
+      const isHorizontal = Math.random() > 0.5;
+      const x = snapToGrid(Math.random() * canvas.offsetWidth);
+      const y = snapToGrid(Math.random() * canvas.offsetHeight);
       gridDots.push({
-        x, y,
+        x,
+        y,
         direction: isHorizontal ? "horizontal" : "vertical",
         speed: Math.random() * 1.5 + 1,
         size: Math.random() * 1 + 1,
         opacity: Math.random() * 0.4 + 0.3,
         color: "rgba(234, 88, 12, 0.8)",
-        targetX: x, targetY: y, trail: [],
-      })
+        targetX: x,
+        targetY: y,
+        trail: [],
+      });
     }
 
-    let animationId: number
-    let lastTime = 0
-    const frameInterval = 1000 / 30
+    let animationId: number;
+    let lastTime = 0;
+    const frameInterval = 1000 / 30;
 
     const animate = (currentTime: number) => {
-      animationId = requestAnimationFrame(animate)
-      const deltaTime = currentTime - lastTime
-      if (deltaTime < frameInterval) return
-      lastTime = currentTime - (deltaTime % frameInterval)
+      animationId = requestAnimationFrame(animate);
+      const deltaTime = currentTime - lastTime;
+      if (deltaTime < frameInterval) return;
+      lastTime = currentTime - (deltaTime % frameInterval);
 
-      ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight)
+      ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
 
       gridDots.forEach((dot) => {
-        dot.trail.unshift({ x: dot.x, y: dot.y })
-        if (dot.trail.length > 10) dot.trail.pop()
+        dot.trail.unshift({ x: dot.x, y: dot.y });
+        if (dot.trail.length > 10) dot.trail.pop();
 
         if (dot.direction === "horizontal") {
           if (Math.abs(dot.x - dot.targetX) < dot.speed) {
-            dot.x = dot.targetX
+            dot.x = dot.targetX;
             if (Math.random() > 0.7) {
-              dot.direction = "vertical"
-              dot.targetY = dot.y + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 5) + 1) * gridSize
+              dot.direction = "vertical";
+              dot.targetY =
+                dot.y +
+                (Math.random() > 0.5 ? 1 : -1) *
+                  (Math.floor(Math.random() * 5) + 1) *
+                  gridSize;
             } else {
-              dot.targetX = dot.x + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 8) + 2) * gridSize
+              dot.targetX =
+                dot.x +
+                (Math.random() > 0.5 ? 1 : -1) *
+                  (Math.floor(Math.random() * 8) + 2) *
+                  gridSize;
             }
           } else {
-            dot.x += dot.x < dot.targetX ? dot.speed : -dot.speed
+            dot.x += dot.x < dot.targetX ? dot.speed : -dot.speed;
           }
         } else {
           if (Math.abs(dot.y - dot.targetY) < dot.speed) {
-            dot.y = dot.targetY
+            dot.y = dot.targetY;
             if (Math.random() > 0.7) {
-              dot.direction = "horizontal"
-              dot.targetX = dot.x + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 8) + 2) * gridSize
+              dot.direction = "horizontal";
+              dot.targetX =
+                dot.x +
+                (Math.random() > 0.5 ? 1 : -1) *
+                  (Math.floor(Math.random() * 8) + 2) *
+                  gridSize;
             } else {
-              dot.targetY = dot.y + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 5) + 1) * gridSize
+              dot.targetY =
+                dot.y +
+                (Math.random() > 0.5 ? 1 : -1) *
+                  (Math.floor(Math.random() * 5) + 1) *
+                  gridSize;
             }
           } else {
-            dot.y += dot.y < dot.targetY ? dot.speed : -dot.speed
+            dot.y += dot.y < dot.targetY ? dot.speed : -dot.speed;
           }
         }
 
-        if (dot.x < -gridSize) { dot.x = canvas.offsetWidth + gridSize; dot.targetX = dot.x; dot.trail = [] }
-        if (dot.x > canvas.offsetWidth + gridSize) { dot.x = -gridSize; dot.targetX = dot.x; dot.trail = [] }
-        if (dot.y < -gridSize) { dot.y = canvas.offsetHeight + gridSize; dot.targetY = dot.y; dot.trail = [] }
-        if (dot.y > canvas.offsetHeight + gridSize) { dot.y = -gridSize; dot.targetY = dot.y; dot.trail = [] }
-
-        if (dot.trail.length > 1) {
-          ctx.beginPath()
-          ctx.moveTo(dot.x, dot.y)
-          for (let i = 0; i < dot.trail.length; i++) ctx.lineTo(dot.trail[i].x, dot.trail[i].y)
-          ctx.strokeStyle = dot.color
-          ctx.globalAlpha = dot.opacity * 0.4
-          ctx.lineWidth = dot.size
-          ctx.lineCap = "round"
-          ctx.stroke()
+        if (dot.x < -gridSize) {
+          dot.x = canvas.offsetWidth + gridSize;
+          dot.targetX = dot.x;
+          dot.trail = [];
+        }
+        if (dot.x > canvas.offsetWidth + gridSize) {
+          dot.x = -gridSize;
+          dot.targetX = dot.x;
+          dot.trail = [];
+        }
+        if (dot.y < -gridSize) {
+          dot.y = canvas.offsetHeight + gridSize;
+          dot.targetY = dot.y;
+          dot.trail = [];
+        }
+        if (dot.y > canvas.offsetHeight + gridSize) {
+          dot.y = -gridSize;
+          dot.targetY = dot.y;
+          dot.trail = [];
         }
 
-        ctx.beginPath()
-        ctx.arc(dot.x, dot.y, dot.size * 4, 0, Math.PI * 2)
-        ctx.fillStyle = dot.color
-        ctx.globalAlpha = dot.opacity * 0.15
-        ctx.fill()
+        if (dot.trail.length > 1) {
+          ctx.beginPath();
+          ctx.moveTo(dot.x, dot.y);
+          for (let i = 0; i < dot.trail.length; i++)
+            ctx.lineTo(dot.trail[i].x, dot.trail[i].y);
+          ctx.strokeStyle = dot.color;
+          ctx.globalAlpha = dot.opacity * 0.4;
+          ctx.lineWidth = dot.size;
+          ctx.lineCap = "round";
+          ctx.stroke();
+        }
 
-        ctx.beginPath()
-        ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2)
-        ctx.fillStyle = dot.color
-        ctx.globalAlpha = dot.opacity
-        ctx.fill()
-      })
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, dot.size * 4, 0, Math.PI * 2);
+        ctx.fillStyle = dot.color;
+        ctx.globalAlpha = dot.opacity * 0.15;
+        ctx.fill();
 
-      ctx.globalAlpha = 1
-    }
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+        ctx.fillStyle = dot.color;
+        ctx.globalAlpha = dot.opacity;
+        ctx.fill();
+      });
 
-    animationId = requestAnimationFrame(animate)
-    return () => { window.removeEventListener("resize", resizeCanvas); cancelAnimationFrame(animationId) }
-  }, [])
+      ctx.globalAlpha = 1;
+    };
+
+    animationId = requestAnimationFrame(animate);
+    return () => {
+      window.removeEventListener("resize", resizeCanvas);
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
 
   return (
     <section className="relative overflow-hidden pt-8 pb-4 sm:pt-12 sm:pb-8 lg:pt-16">
@@ -202,15 +247,18 @@ export function HeroSection() {
               <span className="whitespace-nowrap text-primary">
                 {displayedText2}
                 {displayedText2 !== "" && (
-                  <span className={`inline-block w-[3px] h-[0.9em] bg-primary ml-1 ${isTypingDone ? "animate-blink" : "animate-pulse"}`} />
+                  <span
+                    className={`inline-block w-[3px] h-[0.9em] bg-primary ml-1 ${isTypingDone ? "animate-blink" : "animate-pulse"}`}
+                  />
                 )}
               </span>
             </span>
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg lg:text-xl font-mono">
-            Upload PDFs, YouTube videos, websites, and text. Ask Athena anything about your sources.
-            Get flashcards, notes, practice tests, and audio walkthroughs — instantly.
+            Upload PDFs, YouTube videos, websites, and text. Ask Athena anything
+            about your sources. Get flashcards, notes, practice tests, and audio
+            walkthroughs — instantly.
           </p>
 
           {/* CTAs */}
@@ -221,7 +269,11 @@ export function HeroSection() {
               className="group flex items-center gap-0 bg-foreground text-background text-sm font-mono tracking-wider uppercase w-full sm:w-auto justify-center"
             >
               <span className="flex items-center justify-center w-10 h-10 bg-primary">
-                <ArrowRight size={16} strokeWidth={2} className="text-primary-foreground" />
+                <ArrowRight
+                  size={16}
+                  strokeWidth={2}
+                  className="text-primary-foreground"
+                />
               </span>
               <span className="px-5 py-2.5">Get Started Free</span>
             </motion.button>
@@ -246,7 +298,6 @@ export function HeroSection() {
 
           <DashboardPreview />
 
-
           <div className="lg:hidden flex justify-center mt-4">
             <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
               <span>Scroll to explore</span>
@@ -256,5 +307,5 @@ export function HeroSection() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }

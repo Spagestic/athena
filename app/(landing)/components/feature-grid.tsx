@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { TerminalCard } from "@/components/bento/terminal-card"
-import { DitherCard } from "@/components/bento/dither-card"
-import { MetricsCard } from "@/components/bento/metrics-card"
-import { StatusCard } from "@/components/bento/status-card"
-import { motion } from "framer-motion"
+import { TerminalCard } from "@/components/bento/terminal-card";
+import { DitherCard } from "@/components/bento/dither-card";
+import { MetricsCard } from "@/components/bento/metrics-card";
+import { StatusCard } from "@/components/bento/status-card";
+import { motion } from "framer-motion";
 
-const ease = [0.22, 1, 0.36, 1] as const
+const ease = [0.22, 1, 0.36, 1] as const;
 
 const cardVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -15,7 +15,7 @@ const cardVariants = {
     y: 0,
     transition: { delay: i * 0.1, duration: 0.6, ease },
   }),
-}
+};
 
 export function FeatureGrid() {
   return (
@@ -32,7 +32,9 @@ export function FeatureGrid() {
           {"// SECTION: RAW_DATA"}
         </span>
         <div className="flex-1 border-t border-border" />
-        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">004</span>
+        <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+          004
+        </span>
       </motion.div>
 
       {/* 2x2 Bento Grid */}
@@ -79,5 +81,5 @@ export function FeatureGrid() {
         </motion.div>
       </motion.div>
     </section>
-  )
+  );
 }

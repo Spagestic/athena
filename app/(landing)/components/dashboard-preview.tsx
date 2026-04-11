@@ -4,21 +4,33 @@ export function DashboardPreview() {
       code: "COMP1021",
       title: "INTRODUCTION TO\nCOMPUTER SCIENCE",
       sub: "Refine lab notes into flashcards",
-      stats: [["NOTES", "18"], ["TASKS", "4"], ["AGENTS", "3"]],
+      stats: [
+        ["NOTES", "18"],
+        ["TASKS", "4"],
+        ["AGENTS", "3"],
+      ],
     },
     {
       code: "MATH1014",
       title: "CALCULUS 2",
       sub: "Summarize integration techniques",
-      stats: [["NOTES", "11"], ["TASKS", "3"], ["AGENTS", "2"]],
+      stats: [
+        ["NOTES", "11"],
+        ["TASKS", "3"],
+        ["AGENTS", "2"],
+      ],
     },
     {
       code: "PHYS1112",
       title: "GENERAL PHYSICS 1",
       sub: "Draft a clean wave motion cheat sheet",
-      stats: [["NOTES", "14"], ["TASKS", "2"], ["AGENTS", "4"]],
+      stats: [
+        ["NOTES", "14"],
+        ["TASKS", "2"],
+        ["AGENTS", "4"],
+      ],
     },
-  ]
+  ];
 
   return (
     <div className="relative overflow-x-auto pb-4 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
@@ -35,7 +47,6 @@ export function DashboardPreview() {
 
       {/* Dashboard box — 2px black border, light mode */}
       <div className="relative border-2 border-black bg-white overflow-hidden shadow-2xl min-w-[900px] lg:min-w-0 text-black">
-
         {/* Search bar + avatar + streak */}
         <div className="flex items-center gap-3 border-b border-black/10 px-4 py-3">
           <div className="flex-1 border border-black px-3 py-2">
@@ -49,22 +60,26 @@ export function DashboardPreview() {
             </div>
             <div className="border border-black px-3 h-9 flex items-center gap-1.5 bg-white">
               <span className="text-sm">🔥</span>
-              <span className="text-[10px] font-mono text-primary tracking-widest">STREAK 67</span>
+              <span className="text-[10px] font-mono text-primary tracking-widest">
+                STREAK 67
+              </span>
             </div>
           </div>
         </div>
 
         {/* Row 1: Agentic Workspace + Deadline Radar */}
         <div className="grid grid-cols-5 border-b border-black/10 divide-x divide-black/10">
-
           {/* Panel 1: Agentic Workspace */}
           <div className="col-span-2 p-5">
             <span className="text-[9px] font-mono text-black/40 tracking-[0.2em] uppercase block mb-3">
               AGENTIC WORKSPACE
             </span>
-            <h2 className="text-2xl font-mono font-bold text-black uppercase mb-3">GOOD EVENING</h2>
+            <h2 className="text-2xl font-mono font-bold text-black uppercase mb-3">
+              GOOD EVENING
+            </h2>
             <p className="text-[11px] font-mono text-black/50 leading-relaxed mb-5">
-              Your workspace is tuned to Asia/Hong Kong.<br />
+              Your workspace is tuned to Asia/Hong Kong.
+              <br />
               Surface the most urgent deadlines first.
             </p>
             {/* Orange accent box */}
@@ -91,7 +106,9 @@ export function DashboardPreview() {
                 <span className="text-[9px] font-mono text-black/40 tracking-[0.2em] uppercase block mb-1">
                   DEADLINE RADAR
                 </span>
-                <p className="text-sm font-mono font-bold text-black uppercase">TOP 5 URGENT TASKS</p>
+                <p className="text-sm font-mono font-bold text-black uppercase">
+                  TOP 5 URGENT TASKS
+                </p>
               </div>
               <span className="text-[9px] font-mono text-black/30 uppercase tracking-wide text-right max-w-[160px] leading-tight">
                 BARS SHRINK AS DUE DATES GET CLOSER
@@ -106,17 +123,30 @@ export function DashboardPreview() {
                     <span className="border border-black/20 px-1.5 py-0.5 text-[8px] font-mono text-black/60">
                       COMP1021
                     </span>
-                    <span className="bg-red-600 px-1.5 py-0.5 text-[8px] font-mono text-white" style={{ borderRadius: 2 }}>
+                    <span
+                      className="bg-red-600 px-1.5 py-0.5 text-[8px] font-mono text-white"
+                      style={{ borderRadius: 2 }}
+                    >
                       URGENT
                     </span>
                   </div>
-                  <span className="border border-red-500 text-[9px] font-mono text-red-600 px-1.5 py-0.5">⊙ RISK 93</span>
+                  <span className="border border-red-500 text-[9px] font-mono text-red-600 px-1.5 py-0.5">
+                    ⊙ RISK 93
+                  </span>
                 </div>
-                <p className="text-xs font-mono text-black font-bold uppercase mb-0.5">LAB CHECKPOINT UPLOAD</p>
-                <p className="text-[9px] font-mono text-black/50 uppercase mb-2">DUE IN 4 HOURS</p>
+                <p className="text-xs font-mono text-black font-bold uppercase mb-0.5">
+                  LAB CHECKPOINT UPLOAD
+                </p>
+                <p className="text-[9px] font-mono text-black/50 uppercase mb-2">
+                  DUE IN 4 HOURS
+                </p>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[8px] font-mono text-black/30 uppercase tracking-wider">DEADLINE WINDOW</span>
-                  <span className="text-[8px] font-mono text-red-600">12% REMAINING</span>
+                  <span className="text-[8px] font-mono text-black/30 uppercase tracking-wider">
+                    DEADLINE WINDOW
+                  </span>
+                  <span className="text-[8px] font-mono text-red-600">
+                    12% REMAINING
+                  </span>
                 </div>
                 <div className="h-[3px] bg-black/10">
                   <div className="h-full bg-red-500" style={{ width: "12%" }} />
@@ -130,20 +160,36 @@ export function DashboardPreview() {
                     <span className="border border-black/20 px-1.5 py-0.5 text-[8px] font-mono text-black/60">
                       MATH1014
                     </span>
-                    <span className="bg-orange-500 px-1.5 py-0.5 text-[8px] font-mono text-white" style={{ borderRadius: 2 }}>
+                    <span
+                      className="bg-orange-500 px-1.5 py-0.5 text-[8px] font-mono text-white"
+                      style={{ borderRadius: 2 }}
+                    >
                       MEDIUM
                     </span>
                   </div>
-                  <span className="border border-orange-500 text-[9px] font-mono text-orange-600 px-1.5 py-0.5">⊙ RISK 71</span>
+                  <span className="border border-orange-500 text-[9px] font-mono text-orange-600 px-1.5 py-0.5">
+                    ⊙ RISK 71
+                  </span>
                 </div>
-                <p className="text-xs font-mono text-black font-bold uppercase mb-0.5">PROBLEM SET 06</p>
-                <p className="text-[9px] font-mono text-black/50 uppercase mb-2">DUE IN 1 DAY</p>
+                <p className="text-xs font-mono text-black font-bold uppercase mb-0.5">
+                  PROBLEM SET 06
+                </p>
+                <p className="text-[9px] font-mono text-black/50 uppercase mb-2">
+                  DUE IN 1 DAY
+                </p>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[8px] font-mono text-black/30 uppercase tracking-wider">DEADLINE WINDOW</span>
-                  <span className="text-[8px] font-mono text-orange-600">38% REMAINING</span>
+                  <span className="text-[8px] font-mono text-black/30 uppercase tracking-wider">
+                    DEADLINE WINDOW
+                  </span>
+                  <span className="text-[8px] font-mono text-orange-600">
+                    38% REMAINING
+                  </span>
                 </div>
                 <div className="h-[3px] bg-black/10">
-                  <div className="h-full bg-orange-500" style={{ width: "38%" }} />
+                  <div
+                    className="h-full bg-orange-500"
+                    style={{ width: "38%" }}
+                  />
                 </div>
               </div>
 
@@ -154,20 +200,36 @@ export function DashboardPreview() {
                     <span className="border border-black/20 px-1.5 py-0.5 text-[8px] font-mono text-black/60">
                       PHYS1112
                     </span>
-                    <span className="bg-[#84cc16] px-1.5 py-0.5 text-[8px] font-mono text-white" style={{ borderRadius: 2 }}>
+                    <span
+                      className="bg-[#84cc16] px-1.5 py-0.5 text-[8px] font-mono text-white"
+                      style={{ borderRadius: 2 }}
+                    >
                       STABLE
                     </span>
                   </div>
-                  <span className="border border-[#84cc16] text-[9px] font-mono text-[#65a30d] px-1.5 py-0.5">⊙ RISK 28</span>
+                  <span className="border border-[#84cc16] text-[9px] font-mono text-[#65a30d] px-1.5 py-0.5">
+                    ⊙ RISK 28
+                  </span>
                 </div>
-                <p className="text-xs font-mono text-black font-bold uppercase mb-0.5">OPTICS SUMMARY SHEET</p>
-                <p className="text-[9px] font-mono text-black/50 uppercase mb-2">DUE IN 6 DAYS</p>
+                <p className="text-xs font-mono text-black font-bold uppercase mb-0.5">
+                  OPTICS SUMMARY SHEET
+                </p>
+                <p className="text-[9px] font-mono text-black/50 uppercase mb-2">
+                  DUE IN 6 DAYS
+                </p>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[8px] font-mono text-black/30 uppercase tracking-wider">DEADLINE WINDOW</span>
-                  <span className="text-[8px] font-mono text-[#65a30d]">91% REMAINING</span>
+                  <span className="text-[8px] font-mono text-black/30 uppercase tracking-wider">
+                    DEADLINE WINDOW
+                  </span>
+                  <span className="text-[8px] font-mono text-[#65a30d]">
+                    91% REMAINING
+                  </span>
                 </div>
                 <div className="h-[3px] bg-black/10">
-                  <div className="h-full bg-[#84cc16]" style={{ width: "91%" }} />
+                  <div
+                    className="h-full bg-[#84cc16]"
+                    style={{ width: "91%" }}
+                  />
                 </div>
               </div>
             </div>
@@ -181,7 +243,9 @@ export function DashboardPreview() {
               <span className="text-[9px] font-mono text-black/40 tracking-[0.2em] uppercase block mb-1">
                 ENROLLED MODULES
               </span>
-              <p className="text-sm font-mono font-bold text-black uppercase">YOUR CLASSES</p>
+              <p className="text-sm font-mono font-bold text-black uppercase">
+                YOUR CLASSES
+              </p>
             </div>
             <span className="text-[9px] font-mono text-black/30 uppercase tracking-wide">
               QUICK ACTIONS STAY ATTACHED TO EACH MODULE
@@ -194,9 +258,13 @@ export function DashboardPreview() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-1.5">
                     <span className="text-[10px]">📋</span>
-                    <span className="text-[9px] font-mono text-black/55 tracking-widest uppercase">{code}</span>
+                    <span className="text-[9px] font-mono text-black/55 tracking-widest uppercase">
+                      {code}
+                    </span>
                   </div>
-                  <span className="text-[11px] font-mono text-black/25">···</span>
+                  <span className="text-[11px] font-mono text-black/25">
+                    ···
+                  </span>
                 </div>
                 <p className="text-xs font-mono text-black font-bold uppercase leading-tight mb-1 whitespace-pre-line">
                   {title}
@@ -218,5 +286,5 @@ export function DashboardPreview() {
         </div>
       </div>
     </div>
-  )
+  );
 }

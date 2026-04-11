@@ -1,81 +1,95 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { ArrowRight, Check, Minus } from "lucide-react"
-import { motion, useReducedMotion } from "framer-motion"
+import { useEffect, useState } from "react";
+import { ArrowRight, Check, Minus } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 
-const entrance = [0.16, 1, 0.3, 1] as const
+const entrance = [0.16, 1, 0.3, 1] as const;
 
 /* ΓöÇΓöÇ scramble-in price effect ΓöÇΓöÇ */
-function ScramblePrice({ target, prefix = "$" }: { target: string; prefix?: string }) {
-  const [display, setDisplay] = useState(target.replace(/[0-9]/g, "0"))
+function ScramblePrice({
+  target,
+  prefix = "$",
+}: {
+  target: string;
+  prefix?: string;
+}) {
+  const [display, setDisplay] = useState(target.replace(/[0-9]/g, "0"));
 
   useEffect(() => {
-    let iterations = 0
-    const maxIterations = 18
+    let iterations = 0;
+    const maxIterations = 18;
     const interval = setInterval(() => {
       if (iterations >= maxIterations) {
-        setDisplay(target)
-        clearInterval(interval)
-        return
+        setDisplay(target);
+        clearInterval(interval);
+        return;
       }
       setDisplay(
         target
           .split("")
           .map((char, i) => {
-            if (!/[0-9]/.test(char)) return char
-            if (iterations > maxIterations - 5 && i < iterations - (maxIterations - 5)) return char
-            return String(Math.floor(Math.random() * 10))
+            if (!/[0-9]/.test(char)) return char;
+            if (
+              iterations > maxIterations - 5 &&
+              i < iterations - (maxIterations - 5)
+            )
+              return char;
+            return String(Math.floor(Math.random() * 10));
           })
-          .join("")
-      )
-      iterations++
-    }, 50)
-    return () => clearInterval(interval)
-  }, [target])
+          .join(""),
+      );
+      iterations++;
+    }, 50);
+    return () => clearInterval(interval);
+  }, [target]);
 
   return (
-    <span className="font-mono font-bold" style={{ fontVariantNumeric: "tabular-nums" }}>
-      {prefix}{display}
+    <span
+      className="font-mono font-bold"
+      style={{ fontVariantNumeric: "tabular-nums" }}
+    >
+      {prefix}
+      {display}
     </span>
-  )
+  );
 }
 
 /* ΓöÇΓöÇ data-stream status line ΓöÇΓöÇ */
 function StatusLine() {
-  const [throughput, setThroughput] = useState("0.0")
+  const [throughput, setThroughput] = useState("0.0");
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setThroughput((Math.random() * 50 + 10).toFixed(1))
-    }, 2000)
-    return () => clearInterval(interval)
-  }, [])
+      setThroughput((Math.random() * 50 + 10).toFixed(1));
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="flex items-center gap-2 text-[10px] tracking-widest text-muted-foreground uppercase font-mono">
       <span className="h-1.5 w-1.5 bg-[#ea580c]" />
       <span>live throughput: {throughput}k req/s</span>
     </div>
-  )
+  );
 }
 
 /* ΓöÇΓöÇ blinking cursor indicator ΓöÇΓöÇ */
 function BlinkDot() {
-  return <span className="inline-block h-2 w-2 bg-[#ea580c] animate-blink" />
+  return <span className="inline-block h-2 w-2 bg-[#ea580c] animate-blink" />;
 }
 
 /* ΓöÇΓöÇ tier config ΓöÇΓöÇ */
 interface Tier {
-  id: string
-  name: string
-  price: string
-  period: string
-  tag: string | null
-  description: string
-  features: { text: string; included: boolean }[]
-  cta: string
-  highlighted: boolean
+  id: string;
+  name: string;
+  price: string;
+  period: string;
+  tag: string | null;
+  description: string;
+  features: { text: string; included: boolean }[];
+  cta: string;
+  highlighted: boolean;
 }
 
 const TIERS: Tier[] = [
@@ -133,16 +147,18 @@ const TIERS: Tier[] = [
     cta: "CONTACT US",
     highlighted: false,
   },
-]
+];
 
 /* ΓöÇΓöÇ single pricing card ΓöÇΓöÇ */
 function PricingCard({ tier, index }: { tier: Tier; index: number }) {
-  const isCustom = tier.price === "CUSTOM"
-  const prefersReduced = useReducedMotion()
+  const isCustom = tier.price === "CUSTOM";
+  const prefersReduced = useReducedMotion();
 
   return (
     <motion.div
-      initial={prefersReduced ? false : { opacity: 0, y: 30, filter: "blur(4px)" }}
+      initial={
+        prefersReduced ? false : { opacity: 0, y: 30, filter: "blur(4px)" }
+      }
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ delay: index * 0.12, duration: 0.6, ease: entrance }}
@@ -185,7 +201,9 @@ function PricingCard({ tier, index }: { tier: Tier; index: number }) {
       <div className="px-5 pt-6 pb-4">
         <div className="flex items-baseline gap-1">
           {isCustom ? (
-            <span className="text-3xl lg:text-4xl font-mono font-bold tracking-tight">CUSTOM</span>
+            <span className="text-3xl lg:text-4xl font-mono font-bold tracking-tight">
+              CUSTOM
+            </span>
           ) : (
             <span className="text-3xl lg:text-4xl">
               <ScramblePrice target={tier.price} />
@@ -194,7 +212,9 @@ function PricingCard({ tier, index }: { tier: Tier; index: number }) {
           {tier.period && (
             <span
               className={`text-xs font-mono tracking-widest uppercase ${
-                tier.highlighted ? "text-background/50" : "text-muted-foreground"
+                tier.highlighted
+                  ? "text-background/50"
+                  : "text-muted-foreground"
               }`}
             >
               {tier.period}
@@ -223,7 +243,11 @@ function PricingCard({ tier, index }: { tier: Tier; index: number }) {
               initial={{ opacity: 0, x: -8 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.12 + 0.3 + fi * 0.04, duration: 0.35, ease: entrance }}
+              transition={{
+                delay: index * 0.12 + 0.3 + fi * 0.04,
+                duration: 0.35,
+                ease: entrance,
+              }}
               className="flex items-start gap-3"
             >
               {feature.included ? (
@@ -237,7 +261,9 @@ function PricingCard({ tier, index }: { tier: Tier; index: number }) {
                   size={12}
                   strokeWidth={2}
                   className={`mt-0.5 shrink-0 ${
-                    tier.highlighted ? "text-background/30" : "text-muted-foreground/40"
+                    tier.highlighted
+                      ? "text-background/30"
+                      : "text-muted-foreground/40"
                   }`}
                 />
               )}
@@ -246,8 +272,8 @@ function PricingCard({ tier, index }: { tier: Tier; index: number }) {
                   feature.included
                     ? ""
                     : tier.highlighted
-                    ? "text-background/30 line-through"
-                    : "text-muted-foreground/40 line-through"
+                      ? "text-background/30 line-through"
+                      : "text-muted-foreground/40 line-through"
                 }`}
               >
                 {feature.text}
@@ -276,7 +302,7 @@ function PricingCard({ tier, index }: { tier: Tier; index: number }) {
         </motion.button>
       </div>
     </motion.div>
-  )
+  );
 }
 
 /* ΓöÇΓöÇ main pricing section ΓöÇΓöÇ */
@@ -341,5 +367,5 @@ export function PricingSection() {
         <div className="flex-1 border-t border-border" />
       </motion.div>
     </section>
-  )
+  );
 }

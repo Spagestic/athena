@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { motion, useReducedMotion } from "framer-motion"
+import { motion, useReducedMotion } from "framer-motion";
 
-const entrance = [0.16, 1, 0.3, 1] as const
+const entrance = [0.16, 1, 0.3, 1] as const;
 
 export function Footer() {
-  const prefersReduced = useReducedMotion()
+  const prefersReduced = useReducedMotion();
 
   return (
     <motion.footer
@@ -32,7 +32,11 @@ export function Footer() {
               initial={prefersReduced ? false : { opacity: 0, y: 6 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.1 + i * 0.06, duration: 0.4, ease: entrance }}
+              transition={{
+                delay: 0.1 + i * 0.06,
+                duration: 0.4,
+                ease: entrance,
+              }}
               className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
             >
               {link}
@@ -41,5 +45,5 @@ export function Footer() {
         </div>
       </div>
     </motion.footer>
-  )
+  );
 }
